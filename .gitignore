@@ -49,3 +49,4 @@ frontend_temp/
 .agent/
 AGENT_STATUS.log
 CLEANUP_PENDING.md
+TASKS.md
