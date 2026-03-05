@@ -50,3 +50,4 @@ frontend_temp/
 AGENT_STATUS.log
 CLEANUP_PENDING.md
 TASKS.md
+supabase_schema.sql
