@@ -18,6 +18,8 @@ export default function SignupForm() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [role, setRole] = useState<"user" | "owner">("user");
     const [restaurantName, setRestaurantName] = useState("");
+    const [restaurantAddress, setRestaurantAddress] = useState("");
+    const [restaurantPhone, setRestaurantPhone] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -46,6 +48,14 @@ export default function SignupForm() {
             setError("El nombre del restaurante es obligatorio para dueños");
             return;
         }
+        if (role === "owner" && !restaurantAddress.trim()) {
+            setError("La dirección del restaurante es obligatoria para dueños");
+            return;
+        }
+        if (role === "owner" && !restaurantPhone.trim()) {
+            setError("El teléfono del restaurante es obligatorio para dueños");
+            return;
+        }
 
         setLoading(true);
 
@@ -55,6 +65,8 @@ export default function SignupForm() {
                 password,
                 role,
                 restaurant_name: role === "owner" ? restaurantName : undefined,
+                restaurant_address: role === "owner" ? restaurantAddress : undefined,
+                restaurant_phone: role === "owner" ? restaurantPhone : undefined,
             });
 
             // Redirect based on role
@@ -159,25 +171,63 @@ export default function SignupForm() {
                 />
             </div>
 
-            {/* Conditional restaurant name field */}
+            {/* Conditional restaurant fields */}
             {role === "owner" && (
-                <div>
-                    <label
-                        htmlFor="signup-restaurant-name"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                        Nombre del restaurante
-                    </label>
-                    <input
-                        id="signup-restaurant-name"
-                        type="text"
-                        value={restaurantName}
-                        onChange={(e) => setRestaurantName(e.target.value)}
-                        placeholder="Mi Restaurante"
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
-                        disabled={loading}
-                    />
-                </div>
+                <>
+                    <div>
+                        <label
+                            htmlFor="signup-restaurant-name"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Nombre del restaurante
+                        </label>
+                        <input
+                            id="signup-restaurant-name"
+                            type="text"
+                            value={restaurantName}
+                            onChange={(e) => setRestaurantName(e.target.value)}
+                            placeholder="Mi Restaurante"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                            disabled={loading}
+                        />
+                    </div>
+
+                    <div>
+                        <label
+                            htmlFor="signup-restaurant-address"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Dirección del restaurante
+                        </label>
+                        <input
+                            id="signup-restaurant-address"
+                            type="text"
+                            value={restaurantAddress}
+                            onChange={(e) => setRestaurantAddress(e.target.value)}
+                            placeholder="Calle Gran Vía 1, Madrid"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                            disabled={loading}
+                        />
+                    </div>
+
+                    <div>
+                        <label
+                            htmlFor="signup-restaurant-phone"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Teléfono del restaurante
+                        </label>
+                        <input
+                            id="signup-restaurant-phone"
+                            type="tel"
+                            value={restaurantPhone}
+                            onChange={(e) => setRestaurantPhone(e.target.value)}
+                            placeholder="+34 612 345 678"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                            disabled={loading}
+                        />
+                    </div>
+                </>
             )}
 
             {error && (

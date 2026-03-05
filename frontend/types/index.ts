@@ -17,6 +17,8 @@ export interface SignupRequest {
     password: string;
     role: "user" | "owner";
     restaurant_name?: string;
+    restaurant_address?: string;
+    restaurant_phone?: string;
 }
 
 export interface TokenResponse {

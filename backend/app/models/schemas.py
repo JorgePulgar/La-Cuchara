@@ -30,6 +30,14 @@ class SignupRequest(BaseModel):
         default=None,
         description="Required when role is 'owner'",
     )
+    restaurant_address: str | None = Field(
+        default=None,
+        description="Required when role is 'owner'",
+    )
+    restaurant_phone: str | None = Field(
+        default=None,
+        description="Required when role is 'owner'",
+    )
 
 
 class TokenResponse(BaseModel):

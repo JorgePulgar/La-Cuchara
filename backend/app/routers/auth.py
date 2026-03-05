@@ -30,12 +30,23 @@ async def signup(request: SignupRequest):
     If role is 'owner', also creates a restaurant.
     Returns access_token, user_id, email, and role.
     """
-    # Validate: owner must provide restaurant_name
-    if request.role == "owner" and not request.restaurant_name:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="restaurant_name is required when role is 'owner'",
-        )
+    # Validate: owner must provide restaurant details
+    if request.role == "owner":
+        if not request.restaurant_name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="restaurant_name is required when role is 'owner'",
+            )
+        if not request.restaurant_address:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="restaurant_address is required when role is 'owner'",
+            )
+        if not request.restaurant_phone:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="restaurant_phone is required when role is 'owner'",
+            )
 
     try:
         result = await signup_user(
@@ -43,6 +54,8 @@ async def signup(request: SignupRequest):
             password=request.password,
             role=request.role,
             restaurant_name=request.restaurant_name,
+            restaurant_address=request.restaurant_address,
+            restaurant_phone=request.restaurant_phone,
         )
         return result
     except ValueError as e:

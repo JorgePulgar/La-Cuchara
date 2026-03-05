@@ -44,10 +44,23 @@ async function apiFetch<T>(
         });
 
         if (!response.ok) {
-            const error: ApiError = await response.json().catch(() => ({
+            const errorBody = await response.json().catch(() => ({
                 detail: `HTTP ${response.status}: ${response.statusText}`,
             }));
-            throw new Error(error.detail);
+            // FastAPI returns detail as a string OR an array of validation errors
+            let message: string;
+            if (typeof errorBody.detail === "string") {
+                message = errorBody.detail;
+            } else if (Array.isArray(errorBody.detail)) {
+                message = errorBody.detail
+                    .map((err: { msg?: string; loc?: string[] }) =>
+                        err.msg ?? JSON.stringify(err)
+                    )
+                    .join(", ");
+            } else {
+                message = `HTTP ${response.status}: ${response.statusText}`;
+            }
+            throw new Error(message);
         }
 
         return (await response.json()) as T;

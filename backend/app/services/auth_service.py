@@ -8,6 +8,7 @@ from uuid import UUID
 
 from app.core.supabase import get_supabase_client, get_supabase_admin_client
 from app.models.schemas import TokenResponse
+from app.services.geocoding_service import geocode_address
 
 
 # TODO: conectar Supabase
@@ -18,6 +19,8 @@ async def signup_user(
     password: str,
     role: str,
     restaurant_name: str | None = None,
+    restaurant_address: str | None = None,
+    restaurant_phone: str | None = None,
 ) -> TokenResponse:
     """
     Creates a new user in Supabase Auth, inserts a row in the users table,
@@ -45,36 +48,52 @@ async def signup_user(
     user_id = str(auth_response.user.id)
     access_token = auth_response.session.access_token if auth_response.session else ""
 
-    # 2. If role is 'owner', create a restaurant first
-    restaurant_id = None
-    if role == "owner":
-        if not restaurant_name:
-            raise ValueError("restaurant_name is required when role is 'owner'")
-
-        try:
-            restaurant_result = (
-                supabase.table("restaurants")
-                .insert({"name": restaurant_name, "owner_user_id": user_id})
-                .execute()
-            )
-            if restaurant_result.data:
-                restaurant_id = restaurant_result.data[0]["id"]
-        except Exception as e:
-            raise RuntimeError(f"Failed to create restaurant: {e}")
-
-    # 3. Insert row in users table
+    # 2. Insert row in users table FIRST (without restaurant_id) to satisfy FK constraints
     try:
         user_row = {
             "id": user_id,
             "email": email,
             "role": role,
+            "restaurant_id": None,
         }
-        if restaurant_id:
-            user_row["restaurant_id"] = restaurant_id
-
         supabase.table("users").insert(user_row).execute()
     except Exception as e:
         raise RuntimeError(f"Failed to insert user profile: {e}")
+
+    # 3. If role is 'owner', create the restaurant and update the user
+    if role == "owner":
+        if not restaurant_name:
+            raise ValueError("restaurant_name is required when role is 'owner'")
+        if not restaurant_address:
+            raise ValueError("restaurant_address is required when role is 'owner'")
+        if not restaurant_phone:
+            raise ValueError("restaurant_phone is required when role is 'owner'")
+
+        # Geocode the address to get lat/lon
+        lat, lon = await geocode_address(restaurant_address)
+
+        try:
+            restaurant_data = {
+                "name": restaurant_name,
+                "address": restaurant_address,
+                "phone": restaurant_phone,
+                "lat": lat,
+                "lon": lon,
+                "owner_user_id": user_id,
+            }
+            restaurant_result = (
+                supabase.table("restaurants")
+                .insert(restaurant_data)
+                .execute()
+            )
+            
+            if restaurant_result.data:
+                restaurant_id = restaurant_result.data[0]["id"]
+                # Update user with the new restaurant_id
+                supabase.table("users").update({"restaurant_id": restaurant_id}).eq("id", user_id).execute()
+        except Exception as e:
+            # If restaurant creation fails, we might want to log it, but the user is already created.
+            raise RuntimeError(f"Failed to create restaurant: {e}")
 
     return TokenResponse(
         access_token=access_token,
