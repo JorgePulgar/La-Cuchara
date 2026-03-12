@@ -47,6 +47,7 @@ async def signup_user(
 
     user_id = str(auth_response.user.id)
     access_token = auth_response.session.access_token if auth_response.session else ""
+    refresh_token = auth_response.session.refresh_token if auth_response.session else ""
 
     # 2. Insert row in users table FIRST (without restaurant_id) to satisfy FK constraints
     try:
@@ -97,6 +98,7 @@ async def signup_user(
 
     return TokenResponse(
         access_token=access_token,
+        refresh_token=refresh_token,
         user_id=UUID(user_id),
         email=email,
         role=role,
@@ -127,6 +129,7 @@ async def login_user(email: str, password: str) -> TokenResponse:
 
     user_id = str(auth_response.user.id)
     access_token = auth_response.session.access_token
+    refresh_token = auth_response.session.refresh_token
 
     # 2. Fetch role from users table
     try:
@@ -143,6 +146,51 @@ async def login_user(email: str, password: str) -> TokenResponse:
 
     return TokenResponse(
         access_token=access_token,
+        refresh_token=refresh_token,
+        user_id=UUID(user_id),
+        email=email,
+        role=role,
+    )
+
+
+async def refresh_user_session(refresh_token: str) -> TokenResponse:
+    """
+    Refreshes a Supabase auth session and returns a fresh access/refresh token pair.
+    """
+    try:
+        supabase = get_supabase_client()
+    except RuntimeError as e:
+        raise RuntimeError(f"Supabase not connected: {e}")
+
+    try:
+        auth_response = supabase.auth.refresh_session(refresh_token)
+    except Exception as e:
+        raise RuntimeError(f"Session refresh failed: {e}")
+
+    if auth_response.user is None or auth_response.session is None:
+        raise RuntimeError("Invalid refresh token")
+
+    user_id = str(auth_response.user.id)
+    access_token = auth_response.session.access_token
+    next_refresh_token = auth_response.session.refresh_token
+
+    try:
+        user_data = (
+            supabase.table("users")
+            .select("role,email")
+            .eq("id", user_id)
+            .single()
+            .execute()
+        )
+        role = user_data.data["role"] if user_data.data else "user"
+        email = user_data.data["email"] if user_data.data else auth_response.user.email or ""
+    except Exception:
+        role = "user"
+        email = auth_response.user.email or ""
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=next_refresh_token,
         user_id=UUID(user_id),
         email=email,
         role=role,

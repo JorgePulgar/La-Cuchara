@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import auth
+from app.routers import auth, images, menus
 
 app = FastAPI(
     title="La Cuchara API",
@@ -26,6 +26,8 @@ app.add_middleware(
 
 # --- Register routers ---
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(images.router, prefix="/images", tags=["images"])
+app.include_router(menus.router, prefix="/menus", tags=["menus"])
 
 
 @app.get("/")

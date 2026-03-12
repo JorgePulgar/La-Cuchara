@@ -9,11 +9,17 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.dependencies import get_current_user
 from app.models.schemas import (
     LoginRequest,
+    RefreshTokenRequest,
     SignupRequest,
     TokenResponse,
     UserOut,
 )
-from app.services.auth_service import login_user, logout_user, signup_user
+from app.services.auth_service import (
+    login_user,
+    logout_user,
+    refresh_user_session,
+    signup_user,
+)
 
 router = APIRouter()
 security = HTTPBearer()
@@ -83,6 +89,21 @@ async def login(request: LoginRequest):
             password=request.password,
         )
         return result
+    except RuntimeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e),
+        )
+
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh_session(request: RefreshTokenRequest):
+    """
+    POST /auth/refresh
+    Exchanges a Supabase refresh token for a fresh session.
+    """
+    try:
+        return await refresh_user_session(request.refresh_token)
     except RuntimeError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

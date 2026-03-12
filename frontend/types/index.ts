@@ -23,6 +23,7 @@ export interface SignupRequest {
 
 export interface TokenResponse {
     access_token: string;
+    refresh_token: string;
     user_id: string;
     email: string;
     role: "admin" | "owner" | "user";

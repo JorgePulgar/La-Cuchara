@@ -6,6 +6,7 @@ Pydantic v2 schemas — source of truth for all API contracts.
 from __future__ import annotations
 
 from datetime import date, datetime
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
@@ -43,9 +44,15 @@ class SignupRequest(BaseModel):
 class TokenResponse(BaseModel):
     """Response returned after successful login or signup."""
     access_token: str
+    refresh_token: str
     user_id: UUID
     email: str
     role: str
+
+
+class RefreshTokenRequest(BaseModel):
+    """Request body for refreshing a Supabase auth session."""
+    refresh_token: str = Field(..., min_length=1)
 
 
 # =============================================================================
@@ -118,6 +125,20 @@ class MenuOut(BaseModel):
     season_tag: str | None = None
 
 
+class SaveMenuRequest(BaseModel):
+    """Schema for saving a corrected analyzed menu."""
+    date: date
+    season_tag: str | None = None
+    fields: dict[str, Any] = Field(default_factory=dict)
+    items: list[str] = Field(default_factory=list)
+
+
+class SaveMenuResponse(BaseModel):
+    """Schema returned after persisting a menu and its items."""
+    menu: MenuOut
+    menu_items: list["MenuItemOut"]
+
+
 # =============================================================================
 # Menu Items
 # =============================================================================
@@ -154,6 +175,41 @@ class ImageOut(BaseModel):
     url: str
     uploaded_by: UUID
     upload_ts: datetime
+
+
+# =============================================================================
+# Image Analysis (Azure Content Understanding)
+# =============================================================================
+
+class BoundingRegion(BaseModel):
+    """Represents a bounding region in the analyzed image."""
+    page_number: int | None = None
+    polygon: list[dict] | None = None
+
+
+class ExtractedField(BaseModel):
+    """Represents a field extracted from the analyzed image."""
+    name: str
+    content: str
+    confidence: float
+    bounding_regions: list[BoundingRegion] = []
+
+
+class ImageAnalysisResponse(BaseModel):
+    """Response from menu image analysis using Azure Content Understanding."""
+    status: str = Field(..., description="Status of the analysis (e.g., 'succeeded')")
+    fields: dict[str, Any] = Field(..., description="Raw extracted fields from the image")
+    items: list[ExtractedField] = Field(
+        default_factory=list,
+        description="Structured list of extracted items with confidence scores"
+    )
+
+
+class AnalysisErrorResponse(BaseModel):
+    """Error response from image analysis endpoint."""
+    detail: str
+    error_type: str
+    status_code: int
 
 
 # =============================================================================
