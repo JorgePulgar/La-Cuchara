@@ -100,6 +100,44 @@ class RestaurantOut(BaseModel):
     owner_user_id: UUID | None = None
 
 
+class RestaurantNearbyOut(BaseModel):
+    """Schema for returning a nearby restaurant with distance and optional rating."""
+    id: UUID
+    name: str
+    address: str | None = None
+    lat: float | None = None
+    lon: float | None = None
+    phone: str | None = None
+    owner_user_id: UUID | None = None
+    distance_km: float
+    average_rating: float | None = None
+
+
+class MenuWithItemsOut(BaseModel):
+    """Schema for returning a menu with its items."""
+    id: UUID
+    restaurant_id: UUID
+    date: date
+    source_image_id: UUID | None = None
+    raw_text: str | None = None
+    parsed_json: dict | None = None
+    season_tag: str | None = None
+    items: list["MenuItemOut"] = []
+
+
+class MenuItemSearchOut(BaseModel):
+    """Schema for returning a menu item search result with restaurant info."""
+    id: UUID
+    menu_id: UUID
+    name: str
+    description: str | None = None
+    price: float | None = None
+    tags: list | None = None
+    predicted: bool = False
+    restaurant_id: UUID
+    restaurant_name: str
+
+
 # =============================================================================
 # Menus
 # =============================================================================

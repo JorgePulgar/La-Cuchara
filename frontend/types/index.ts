@@ -54,6 +54,41 @@ export interface Restaurant {
     owner_user_id?: string | null;
 }
 
+export interface NearbyRestaurant {
+    id: string;
+    name: string;
+    address?: string | null;
+    lat?: number | null;
+    lon?: number | null;
+    phone?: string | null;
+    owner_user_id?: string | null;
+    distance_km: number;
+    average_rating?: number | null;
+}
+
+export interface MenuWithItems {
+    id: string;
+    restaurant_id: string;
+    date: string;
+    source_image_id?: string | null;
+    raw_text?: string | null;
+    parsed_json?: Record<string, unknown> | null;
+    season_tag?: string | null;
+    items: MenuItem[];
+}
+
+export interface MenuItemSearchResult {
+    id: string;
+    menu_id: string;
+    name: string;
+    description?: string | null;
+    price?: number | null;
+    tags?: string[] | null;
+    predicted: boolean;
+    restaurant_id: string;
+    restaurant_name: string;
+}
+
 // =============================================================================
 // Menus
 // =============================================================================

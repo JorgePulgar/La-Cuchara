@@ -342,3 +342,63 @@ export async function saveMenu(data: SaveMenuRequest): Promise<SaveMenuResponse>
         body: JSON.stringify(data),
     });
 }
+
+// =============================================================================
+// Restaurant Discovery API Functions
+// =============================================================================
+
+import type {
+    NearbyRestaurant,
+    MenuWithItems,
+    MenuItemSearchResult,
+} from "@/types";
+
+export interface NearbyFilters {
+    radius_km?: number;
+    min_rating?: number;
+    has_menu_today?: boolean;
+}
+
+/**
+ * GET /restaurants/nearby
+ */
+export async function getNearbyRestaurants(
+    lat: number,
+    lon: number,
+    filters?: NearbyFilters,
+): Promise<NearbyRestaurant[]> {
+    const params = new URLSearchParams({
+        lat: lat.toString(),
+        lon: lon.toString(),
+    });
+    if (filters?.radius_km) params.set("radius_km", filters.radius_km.toString());
+    if (filters?.min_rating) params.set("min_rating", filters.min_rating.toString());
+    if (filters?.has_menu_today) params.set("has_menu_today", "true");
+
+    return apiFetch<NearbyRestaurant[]>(`/restaurants/nearby?${params.toString()}`);
+}
+
+/**
+ * GET /restaurants/{restaurantId}/menu/today
+ */
+export async function getTodayMenu(restaurantId: string): Promise<MenuWithItems> {
+    return apiFetch<MenuWithItems>(`/restaurants/${restaurantId}/menu/today`);
+}
+
+/**
+ * GET /menus/search
+ */
+export async function searchMenuItems(
+    q: string,
+    lat: number,
+    lon: number,
+    radiusKm: number = 5,
+): Promise<MenuItemSearchResult[]> {
+    const params = new URLSearchParams({
+        q,
+        lat: lat.toString(),
+        lon: lon.toString(),
+        radius_km: radiusKm.toString(),
+    });
+    return apiFetch<MenuItemSearchResult[]>(`/menus/search?${params.toString()}`);
+}
