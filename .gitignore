@@ -51,3 +51,10 @@ AGENT_STATUS.log
 CLEANUP_PENDING.md
 TASKS.md
 supabase_schema.sql
+
+*.csv
+*.rar
+*.jpg
+*.jpeg
+*.png
+prueba*
