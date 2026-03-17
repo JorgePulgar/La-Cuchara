@@ -103,7 +103,7 @@ export default function LoginForm() {
             <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-ecruwhite text-thunderbird-700 border-2 border-thunderbird-700 hover:bg-ecruwhite/80 disabled:opacity-50 font-bold py-3 rounded-lg shadow-sm transition-all cursor-pointer disabled:cursor-not-allowed uppercase tracking-wider text-sm"
+                className="w-full bg-thunderbird-700 text-ecruwhite border-2 border-thunderbird-700 hover:bg-thunderbird-800 disabled:opacity-50 font-bold py-3 rounded-lg shadow-md transition-all cursor-pointer disabled:cursor-not-allowed uppercase tracking-wider text-sm"
             >
                 {loading ? "Iniciando sesión..." : "Iniciar sesión"}
             </button>

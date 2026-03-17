@@ -6,12 +6,13 @@
  */
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { logout, isAuthenticated, getUserRole } from "@/lib/api";
 
 export default function Navbar() {
     const router = useRouter();
+    const pathname = usePathname();
     const [authenticated, setAuthenticated] = useState(false);
     const [role, setRole] = useState<string | null>(null);
 
@@ -34,45 +35,49 @@ export default function Navbar() {
             </Link>
 
             <div className="flex items-center gap-4">
-                {authenticated ? (
+                {pathname !== "/" && pathname !== "/login" && pathname !== "/signup" && (
                     <>
-                        {role === "user" && (
-                            <Link
-                                href="/dashboard"
-                                className="text-sm border-b border-transparent hover:border-ecruwhite transition-all font-medium"
-                            >
-                                Dashboard
-                            </Link>
+                        {authenticated ? (
+                            <>
+                                {role === "user" && (
+                                    <Link
+                                        href="/dashboard"
+                                        className="text-sm border-b border-transparent hover:border-ecruwhite transition-all font-medium"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                )}
+                                {role === "owner" && (
+                                    <Link
+                                        href="/restaurant/dashboard"
+                                        className="text-sm border-b border-transparent hover:border-ecruwhite transition-all font-medium"
+                                    >
+                                        Mi Restaurante
+                                    </Link>
+                                )}
+                                <button
+                                    onClick={handleLogout}
+                                    className="text-sm bg-thunderbird-800 text-ecruwhite hover:bg-thunderbird-900 border border-thunderbird-600 px-4 py-2 rounded-lg font-bold shadow-sm transition-all cursor-pointer"
+                                >
+                                    Cerrar sesión
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link
+                                    href="/login"
+                                    className="text-sm border-b border-transparent hover:border-ecruwhite transition-all font-medium"
+                                >
+                                    Iniciar sesión
+                                </Link>
+                                <Link
+                                    href="/signup"
+                                    className="text-sm bg-thunderbird-800 text-ecruwhite hover:bg-thunderbird-900 px-4 py-2 rounded-lg font-bold shadow-sm transition-all border border-thunderbird-600"
+                                >
+                                    Crear cuenta
+                                </Link>
+                            </>
                         )}
-                        {role === "owner" && (
-                            <Link
-                                href="/restaurant/dashboard"
-                                className="text-sm border-b border-transparent hover:border-ecruwhite transition-all font-medium"
-                            >
-                                Mi Restaurante
-                            </Link>
-                        )}
-                        <button
-                            onClick={handleLogout}
-                            className="text-sm bg-ecruwhite text-thunderbird-700 hover:bg-ecruwhite/80 px-4 py-2 rounded-lg font-bold shadow-sm transition-all cursor-pointer"
-                        >
-                            Cerrar sesión
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <Link
-                            href="/login"
-                            className="text-sm border-b border-transparent hover:border-ecruwhite transition-all font-medium"
-                        >
-                            Iniciar sesión
-                        </Link>
-                        <Link
-                            href="/signup"
-                            className="text-sm bg-ecruwhite text-thunderbird-700 hover:bg-ecruwhite/80 px-4 py-2 rounded-lg font-bold shadow-sm transition-all"
-                        >
-                            Crear cuenta
-                        </Link>
                     </>
                 )}
             </div>
