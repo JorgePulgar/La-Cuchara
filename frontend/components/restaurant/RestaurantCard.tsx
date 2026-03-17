@@ -21,21 +21,21 @@ export default function RestaurantCard({
     menuLoading = false,
 }: RestaurantCardProps) {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow">
+        <div className="bg-ecruwhite rounded-2xl border-2 border-thunderbird-200 p-6 shadow-md hover:shadow-xl transition-all border-b-4 border-b-thunderbird-100">
             <div className="flex justify-between items-start mb-3">
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-xl font-bold text-thunderbird-950">
                         {restaurant.name}
                     </h3>
                     {restaurant.address && (
-                        <p className="text-sm text-gray-500 mt-0.5">
+                        <p className="text-xs font-medium text-gray-500 mt-1">
                             📍 {restaurant.address}
                         </p>
                     )}
                 </div>
                 <div className="text-right flex-shrink-0 ml-4">
-                    <span className="inline-block bg-amber-100 text-amber-800 text-sm font-medium px-2.5 py-1 rounded-full">
-                        {restaurant.distance_km.toFixed(1)} km
+                    <span className="inline-block bg-thunderbird-700 text-ecruwhite text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-sm">
+                        {restaurant.distance_km.toFixed(1)} KM
                     </span>
                 </div>
             </div>
@@ -44,8 +44,8 @@ export default function RestaurantCard({
                 <div className="flex items-center gap-3">
                     {restaurant.average_rating != null && (
                         <div className="flex items-center gap-1">
-                            <span className="text-amber-500">⭐</span>
-                            <span className="text-sm font-medium text-gray-700">
+                            <span className="text-thunderbird-600">★</span>
+                            <span className="text-sm font-bold text-thunderbird-900">
                                 {restaurant.average_rating.toFixed(1)}
                             </span>
                         </div>
@@ -60,9 +60,9 @@ export default function RestaurantCard({
                 <button
                     onClick={() => onViewMenu(restaurant.id)}
                     disabled={menuLoading}
-                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
+                    className="px-5 py-2.5 bg-ecruwhite text-thunderbird-700 border-2 border-thunderbird-700 hover:bg-white disabled:opacity-50 text-[10px] font-black uppercase tracking-widest rounded-xl shadow-sm transition-all cursor-pointer disabled:cursor-not-allowed"
                 >
-                    {menuLoading ? "Cargando..." : "Ver menú de hoy"}
+                    {menuLoading ? "..." : "Ver menú"}
                 </button>
             </div>
         </div>

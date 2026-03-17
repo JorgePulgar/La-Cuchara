@@ -6,9 +6,9 @@ export default function LoginPage() {
     return (
         <>
             <Navbar />
-            <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
+            <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-ecruwhite">
                 <div className="w-full max-w-md">
-                    <div className="bg-white rounded-2xl shadow-lg p-8">
+                    <div className="bg-ecruwhite/80 rounded-2xl shadow-xl border-4 border-white/50 p-8 backdrop-blur-sm">
                         <h1 className="text-2xl font-bold text-center text-gray-900 mb-6">
                             Iniciar sesión
                         </h1>

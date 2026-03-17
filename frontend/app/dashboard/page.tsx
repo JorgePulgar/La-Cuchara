@@ -99,11 +99,11 @@ export default function DashboardPage() {
     return (
         <ProtectedRoute requiredRole="user">
             <Navbar />
-            <main className="min-h-screen bg-gray-50 px-4 py-8">
+            <main className="min-h-screen px-4 py-8">
                 <div className="max-w-5xl mx-auto">
                     {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-2xl font-bold text-gray-900">
+                        <h1 className="text-3xl font-brand text-thunderbird-700">
                             ¡Bienvenido a La Cuchara!
                         </h1>
                         {userEmail && (
@@ -120,8 +120,8 @@ export default function DashboardPage() {
                         <>
                             {/* Location badge + change button */}
                             <div className="flex items-center gap-2 mb-6">
-                                <span className="bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">
-                                    📍 Ubicación establecida ({location.lat.toFixed(4)}, {location.lon.toFixed(4)})
+                                <span className="bg-thunderbird-100 text-thunderbird-800 text-sm font-bold px-3 py-1 rounded-full shadow-sm border border-thunderbird-200">
+                                    📍 Ubicación established ({location.lat.toFixed(4)}, {location.lon.toFixed(4)})
                                 </span>
                                 <button
                                     onClick={() => {
@@ -129,7 +129,7 @@ export default function DashboardPage() {
                                         setRestaurants([]);
                                         setSelectedMenu(null);
                                     }}
-                                    className="text-sm text-gray-500 hover:text-gray-700 underline cursor-pointer"
+                                    className="text-sm text-thunderbird-700 hover:text-thunderbird-900 font-bold underline cursor-pointer"
                                 >
                                     Cambiar
                                 </button>
@@ -170,10 +170,10 @@ export default function DashboardPage() {
                             {/* Today's menu modal / panel */}
                             {(selectedMenu || menuError) && (
                                 <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-                                    <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <h3 className="text-lg font-bold text-gray-900">
-                                                📋 Menú de hoy — {selectedRestaurantName}
+                                    <div className="bg-ecruwhite rounded-3xl shadow-2xl border-4 border-thunderbird-100 max-w-lg w-full max-h-[80vh] overflow-y-auto p-8">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <h3 className="text-2xl font-brand text-thunderbird-700">
+                                                Menú de hoy — {selectedRestaurantName}
                                             </h3>
                                             <button
                                                 onClick={() => {
@@ -187,13 +187,13 @@ export default function DashboardPage() {
                                         </div>
 
                                         {menuError ? (
-                                            <div className="bg-amber-50 text-amber-800 text-sm px-4 py-3 rounded-lg border border-amber-200">
+                                            <div className="bg-thunderbird-50 text-thunderbird-800 text-sm px-4 py-3 rounded-lg border border-thunderbird-200">
                                                 {menuError}
                                             </div>
                                         ) : selectedMenu ? (
                                             <>
                                                 {selectedMenu.season_tag && (
-                                                    <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full mb-3">
+                                                    <span className="inline-block bg-thunderbird-700 text-ecruwhite text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md mb-4">
                                                         {selectedMenu.season_tag}
                                                     </span>
                                                 )}
@@ -207,7 +207,7 @@ export default function DashboardPage() {
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                                                             {/* Primeros */}
                                                             <div>
-                                                                <h4 className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Primeros platos</h4>
+                                                                <h4 className="text-[10px] font-black text-thunderbird-600 uppercase tracking-widest mb-3">Primeros platos</h4>
                                                                 <ul className="space-y-4">
                                                                     {selectedMenu.items
                                                                         .filter(item => {
@@ -247,7 +247,7 @@ export default function DashboardPage() {
                                                             </div>
                                                             {/* Segundos */}
                                                             <div>
-                                                                <h4 className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Segundos platos</h4>
+                                                                <h4 className="text-[10px] font-black text-thunderbird-600 uppercase tracking-widest mb-3">Segundos platos</h4>
                                                                 <ul className="space-y-4">
                                                                     {selectedMenu.items
                                                                         .filter(item => {

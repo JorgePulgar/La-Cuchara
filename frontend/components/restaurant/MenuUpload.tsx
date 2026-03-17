@@ -299,12 +299,12 @@ export default function MenuUpload() {
     if (phase === "analyzing") {
         return (
             <div className="w-full max-w-4xl">
-                <div className="rounded-xl border border-amber-200 bg-amber-50 p-8 text-center space-y-4">
-                    <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-amber-200 border-t-amber-600" />
-                    <h3 className="text-lg font-semibold text-amber-900">
+                <div className="rounded-2xl border-4 border-ecruwhite bg-ecruwhite shadow-xl p-12 text-center space-y-6">
+                    <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-thunderbird-100 border-t-thunderbird-700 shadow-sm" />
+                    <h3 className="text-2xl font-brand text-thunderbird-700">
                         Analizando imagen del menú
                     </h3>
-                    <p className="text-sm text-amber-800">
+                    <p className="text-sm font-medium text-gray-600">
                         Enviando a Azure Content Understanding y esperando resultados...
                     </p>
                 </div>
@@ -333,12 +333,12 @@ export default function MenuUpload() {
                     </div>
                 )}
 
-                <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-6">
-                    <div className="border-b pb-4">
-                        <h2 className="text-2xl font-bold text-gray-900">
+                <div className="bg-ecruwhite border-2 border-thunderbird-100 shadow-xl rounded-2xl p-8 space-y-8">
+                    <div className="border-b border-gray-100 pb-6">
+                        <h2 className="text-3xl font-brand text-thunderbird-700">
                             Formulario del menú
                         </h2>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm font-medium text-gray-500 mt-1">
                             Revisa y corrige los campos antes de guardar.
                         </p>
                     </div>
@@ -356,7 +356,7 @@ export default function MenuUpload() {
                                 type="date"
                                 value={menuDate}
                                 onChange={(e) => setMenuDate(e.target.value)}
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 bg-ecruwhite/50 focus:outline-none focus:ring-2 focus:ring-thunderbird-700 focus:border-thunderbird-700 transition-all font-medium"
                             />
                         </div>
 
@@ -371,7 +371,7 @@ export default function MenuUpload() {
                                 id="season-tag"
                                 value={seasonTag}
                                 onChange={(e) => setSeasonTag(e.target.value)}
-                                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 bg-ecruwhite/50 focus:outline-none focus:ring-2 focus:ring-thunderbird-700 focus:border-thunderbird-700 transition-all font-medium"
                             >
                                 <option value="">Seleccionar temporada</option>
                                 <option value="Primavera">Primavera</option>
@@ -402,8 +402,8 @@ export default function MenuUpload() {
                                                 {field.label}
                                             </label>
                                             {typeof field.confidence === "number" && (
-                                                <span className="text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-700">
-                                                    {(field.confidence * 100).toFixed(1)}%
+                                                <span className="text-[10px] uppercase font-black tracking-widest px-2.5 py-1 rounded-md bg-thunderbird-700 text-ecruwhite">
+                                                    {(field.confidence * 100).toFixed(1)}% Confianza
                                                 </span>
                                             )}
                                         </div>
@@ -420,7 +420,7 @@ export default function MenuUpload() {
                                                 };
                                                 setEditableFields(next);
                                             }}
-                                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                            className="w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 bg-ecruwhite/50 focus:outline-none focus:ring-2 focus:ring-thunderbird-700 focus:border-thunderbird-700 transition-all font-medium"
                                         />
                                     </div>
                                 ))}
@@ -451,7 +451,7 @@ export default function MenuUpload() {
                                         },
                                     ]);
                                 }}
-                                className="text-sm bg-amber-100 hover:bg-amber-200 text-amber-800 font-medium px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                                className="text-[10px] font-black uppercase tracking-widest bg-thunderbird-700 hover:bg-thunderbird-800 text-ecruwhite px-4 py-2 rounded-lg transition-all shadow-sm cursor-pointer"
                             >
                                 + Añadir plato
                             </button>
@@ -505,7 +505,7 @@ export default function MenuUpload() {
                                                 setEditableMenuItems(next);
                                             }}
                                             placeholder="Nombre del plato"
-                                            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                            className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 bg-ecruwhite/50 focus:outline-none focus:ring-2 focus:ring-thunderbird-700 focus:border-thunderbird-700 transition-all font-medium"
                                         />
                                         <select
                                             value={item.course}
@@ -517,7 +517,7 @@ export default function MenuUpload() {
                                                 };
                                                 setEditableMenuItems(next);
                                             }}
-                                            className="w-32 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                            className="w-32 rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 bg-ecruwhite/50 focus:outline-none focus:ring-2 focus:ring-thunderbird-700 focus:border-thunderbird-700 transition-all font-bold"
                                         >
                                             <option value="primero">Primero</option>
                                             <option value="segundo">Segundo</option>
@@ -535,21 +535,21 @@ export default function MenuUpload() {
                     </div>
 
                     <div className="pt-2">
-                        <div className="flex flex-col md:flex-row gap-3">
+                        <div className="flex flex-col md:flex-row gap-4">
                             <button
                                 type="button"
                                 onClick={handleSaveChanges}
                                 disabled={saving}
-                                className="w-full md:w-auto bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                className="w-full md:w-auto bg-ecruwhite text-thunderbird-700 border-2 border-thunderbird-700 hover:bg-white disabled:opacity-50 font-black uppercase tracking-widest text-sm py-3 px-8 rounded-xl shadow-lg transition-all cursor-pointer disabled:cursor-not-allowed"
                             >
-                                {saving ? "Guardando cambios..." : "Guardar cambios"}
+                                {saving ? "Guardando..." : "✅ Guardar cambios"}
                             </button>
 
                             <button
                                 type="button"
                                 onClick={handleAnalyzeAnotherImage}
                                 disabled={saving}
-                                className="w-full md:w-auto bg-slate-100 hover:bg-slate-200 disabled:bg-slate-100 text-slate-800 font-medium py-2.5 px-4 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                className="w-full md:w-auto bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 text-gray-600 font-bold py-3 px-8 rounded-xl transition-all cursor-pointer disabled:cursor-not-allowed"
                             >
                                 Analizar otra imagen
                             </button>
@@ -591,7 +591,7 @@ export default function MenuUpload() {
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 transition-colors"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-thunderbird-50 file:text-thunderbird-700 hover:file:bg-thunderbird-100 transition-colors"
                     />
                     {imageFile && (
                         <p className="text-xs text-gray-500 mt-1">
@@ -602,7 +602,7 @@ export default function MenuUpload() {
 
                 <button
                     type="submit"
-                    className="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 rounded-lg transition-colors cursor-pointer"
+                    className="w-full bg-thunderbird-700 hover:bg-thunderbird-800 text-ecruwhite font-black uppercase tracking-widest py-3.5 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] active:scale-95 cursor-pointer"
                 >
                     📸 Analizar menú
                 </button>

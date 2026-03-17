@@ -64,20 +64,20 @@ export default function MenuItemSearch({ lat, lon, radiusKm }: MenuItemSearchPro
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Buscar platos (ej: paella, ensalada, tortilla...)"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500 bg-white"
+                    className="w-full pl-10 pr-4 py-3 bg-ecruwhite border-2 border-thunderbird-100 rounded-2xl shadow-lg focus:ring-2 focus:ring-thunderbird-700 focus:border-thunderbird-700 outline-none transition-all text-black placeholder:text-gray-400 font-medium"
                 />
                 {loading && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-amber-600" />
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-thunderbird-700" />
                     </span>
                 )}
             </div>
 
             {/* Results */}
             {searched && query.trim() && (
-                <div className="mt-3 bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="mt-3 bg-ecruwhite rounded-2xl border-2 border-thunderbird-100 shadow-xl overflow-hidden">
                     {results.length === 0 ? (
-                        <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                        <div className="px-6 py-10 text-center text-gray-500 text-sm font-medium italic">
                             No se encontraron platos para &quot;{query}&quot;
                         </div>
                     ) : (
@@ -86,7 +86,7 @@ export default function MenuItemSearch({ lat, lon, radiusKm }: MenuItemSearchPro
                                 <li key={item.id} className="px-4 py-3 hover:bg-gray-50">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="font-medium text-gray-900">
+                                            <p className="font-bold text-thunderbird-950">
                                                 {item.name}
                                             </p>
                                             {item.description && (
@@ -94,7 +94,7 @@ export default function MenuItemSearch({ lat, lon, radiusKm }: MenuItemSearchPro
                                                     {item.description}
                                                 </p>
                                             )}
-                                            <p className="text-xs text-amber-700 mt-1">
+                                            <p className="text-xs font-black text-thunderbird-700 mt-1 uppercase tracking-widest">
                                                 🍽️ {item.restaurant_name}
                                             </p>
                                         </div>

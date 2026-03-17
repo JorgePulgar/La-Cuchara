@@ -28,9 +28,9 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="w-full bg-gray-900 text-white px-6 py-4 flex items-center justify-between shadow-md">
-            <Link href="/" className="text-xl font-bold tracking-tight hover:opacity-80 transition-opacity">
-                🍽️ La Cuchara
+        <nav className="w-full bg-thunderbird-700 text-ecruwhite px-6 py-4 flex items-center justify-between shadow-md border-b border-thunderbird-800">
+            <Link href="/" className="text-3xl font-brand tracking-wide hover:opacity-90 transition-opacity">
+                La Cuchara
             </Link>
 
             <div className="flex items-center gap-4">
@@ -39,7 +39,7 @@ export default function Navbar() {
                         {role === "user" && (
                             <Link
                                 href="/dashboard"
-                                className="text-sm hover:text-amber-400 transition-colors"
+                                className="text-sm border-b border-transparent hover:border-ecruwhite transition-all font-medium"
                             >
                                 Dashboard
                             </Link>
@@ -47,14 +47,14 @@ export default function Navbar() {
                         {role === "owner" && (
                             <Link
                                 href="/restaurant/dashboard"
-                                className="text-sm hover:text-amber-400 transition-colors"
+                                className="text-sm border-b border-transparent hover:border-ecruwhite transition-all font-medium"
                             >
                                 Mi Restaurante
                             </Link>
                         )}
                         <button
                             onClick={handleLogout}
-                            className="text-sm bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md transition-colors cursor-pointer"
+                            className="text-sm bg-ecruwhite text-thunderbird-700 hover:bg-ecruwhite/80 px-4 py-2 rounded-lg font-bold shadow-sm transition-all cursor-pointer"
                         >
                             Cerrar sesión
                         </button>
@@ -63,13 +63,13 @@ export default function Navbar() {
                     <>
                         <Link
                             href="/login"
-                            className="text-sm hover:text-amber-400 transition-colors"
+                            className="text-sm border-b border-transparent hover:border-ecruwhite transition-all font-medium"
                         >
                             Iniciar sesión
                         </Link>
                         <Link
                             href="/signup"
-                            className="text-sm bg-amber-600 hover:bg-amber-700 px-3 py-1.5 rounded-md transition-colors"
+                            className="text-sm bg-ecruwhite text-thunderbird-700 hover:bg-ecruwhite/80 px-4 py-2 rounded-lg font-bold shadow-sm transition-all"
                         >
                             Crear cuenta
                         </Link>

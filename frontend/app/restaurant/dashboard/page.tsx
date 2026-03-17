@@ -62,16 +62,16 @@ export default function OwnerDashboard() {
     return (
         <ProtectedRoute requiredRole="owner">
             <Navbar />
-            <main className="min-h-screen bg-gray-50 px-4 py-12">
+            <main className="min-h-screen px-4 py-12">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex justify-between items-center mb-8">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900">Panel del Restaurante</h1>
-                            <p className="text-gray-600 mt-1">Gestiona tus menús y platos</p>
+                            <h1 className="text-3xl font-brand text-thunderbird-700">Panel del Restaurante</h1>
+                            <p className="text-sm font-medium text-gray-600 mt-1">Gestiona tus menús y platos</p>
                         </div>
                         <Link
                             href="/restaurant/upload"
-                            className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg transition-all transform hover:scale-105"
+                            className="bg-thunderbird-700 hover:bg-thunderbird-800 text-ecruwhite font-bold py-3 px-8 rounded-xl shadow-lg transition-all transform hover:scale-105"
                         >
                             + Subir nuevo menú
                         </Link>
@@ -80,7 +80,7 @@ export default function OwnerDashboard() {
                     <div className="flex justify-end mb-4">
                         <button
                             onClick={() => setShowAll(!showAll)}
-                            className="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors border border-gray-300 rounded-lg px-4 py-2 bg-white cursor-pointer hover:bg-gray-50 flex items-center gap-2 shadow-sm"
+                            className="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors border border-gray-300 rounded-lg px-4 py-2 bg-ecruwhite cursor-pointer hover:bg-white flex items-center gap-2 shadow-sm"
                         >
                             {showAll ? "Ocultar meses anteriores" : "Mostrar todos los menús"}
                         </button>
@@ -88,14 +88,14 @@ export default function OwnerDashboard() {
 
                     {loading ? (
                         <div className="flex justify-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-thunderbird-700"></div>
                         </div>
                     ) : error ? (
                         <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl">
                             {error}
                         </div>
                     ) : menus.length === 0 ? (
-                        <div className="bg-white rounded-2xl shadow-sm p-12 text-center border border-gray-100">
+                        <div className="bg-ecruwhite/50 rounded-2xl shadow-sm p-12 text-center border-2 border-thunderbird-100">
                             <div className="text-5xl mb-4">📋</div>
                             <h2 className="text-xl font-semibold text-gray-900 mb-2">Aún no tienes menús guardados</h2>
                             <p className="text-gray-500 mb-8 max-w-sm mx-auto">
@@ -103,7 +103,7 @@ export default function OwnerDashboard() {
                             </p>
                             <Link
                                 href="/restaurant/upload"
-                                className="text-amber-600 font-bold hover:underline"
+                                className="text-thunderbird-600 font-bold hover:underline"
                             >
                                 Subir mi primer menú &rarr;
                             </Link>
@@ -111,10 +111,10 @@ export default function OwnerDashboard() {
                     ) : (
                         <div className="grid gap-6">
                             {displayedMenus.map((m) => (
-                                <div key={m.menu.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
-                                    <div className="bg-gray-50/50 px-6 py-4 flex justify-between items-center border-b border-gray-100">
+                                <div key={m.menu.id} className="bg-ecruwhite rounded-2xl shadow-sm border-2 border-thunderbird-100 overflow-hidden hover:shadow-md transition-shadow">
+                                    <div className="bg-thunderbird-50/30 px-6 py-4 flex justify-between items-center border-b border-thunderbird-100">
                                         <div className="flex items-center gap-4">
-                                            <span className="text-lg font-bold text-gray-900">
+                                            <span className="text-lg font-bold text-thunderbird-900">
                                                 {new Date(m.menu.date).toLocaleDateString("es-ES", {
                                                     weekday: 'long',
                                                     day: 'numeric',
@@ -127,7 +127,7 @@ export default function OwnerDashboard() {
                                                 </span>
                                             )}
                                             {m.menu.season_tag && (
-                                                <span className="bg-amber-100 text-amber-800 text-[10px] uppercase tracking-wider font-black px-2 py-0.5 rounded">
+                                                <span className="bg-thunderbird-100 text-thunderbird-800 text-[10px] uppercase tracking-wider font-black px-2 py-0.5 rounded">
                                                     {m.menu.season_tag}
                                                 </span>
                                             )}
@@ -152,11 +152,11 @@ export default function OwnerDashboard() {
                                             <button
                                                 onClick={() => handleReuse(m)}
                                                 disabled={savingId === m.menu.id}
-                                                className="ml-4 text-xs font-bold bg-white border-2 border-amber-600 text-amber-700 hover:bg-amber-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                                className="ml-4 text-[10px] uppercase tracking-wider font-black bg-ecruwhite border-2 border-thunderbird-700 text-thunderbird-700 hover:bg-white px-4 py-2 rounded-lg transition-all cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                             >
                                                 {savingId === m.menu.id ? (
                                                     <>
-                                                        <span className="w-3 h-3 border-2 border-amber-700 border-t-transparent rounded-full animate-spin"></span>
+                                                        <span className="w-3 h-3 border-2 border-thunderbird-700 border-t-transparent rounded-full animate-spin"></span>
                                                         Guardando...
                                                     </>
                                                 ) : "Reutilizar para hoy"}
@@ -167,7 +167,7 @@ export default function OwnerDashboard() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                                             {/* Primeros */}
                                             <div>
-                                                <h3 className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Primeros platos</h3>
+                                                <h3 className="text-[10px] font-black text-thunderbird-600 uppercase tracking-widest mb-3">Primeros platos</h3>
                                                 <ul className="space-y-2">
                                                     {m.menu_items
                                                         .filter(item => {
@@ -199,7 +199,7 @@ export default function OwnerDashboard() {
                                             </div>
                                             {/* Segundos */}
                                             <div>
-                                                <h3 className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-3">Segundos platos</h3>
+                                                <h3 className="text-[10px] font-black text-thunderbird-600 uppercase tracking-widest mb-3">Segundos platos</h3>
                                                 <ul className="space-y-2">
                                                     {m.menu_items
                                                         .filter(item => {
