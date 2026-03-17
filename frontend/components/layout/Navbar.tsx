@@ -46,10 +46,10 @@ export default function Navbar() {
                         )}
                         {role === "owner" && (
                             <Link
-                                href="/restaurant/upload"
+                                href="/restaurant/dashboard"
                                 className="text-sm hover:text-amber-400 transition-colors"
                             >
-                                Subir menú
+                                Mi Restaurante
                             </Link>
                         )}
                         <button

@@ -163,3 +163,52 @@ async def search_menu_items(
         })
 
     return results
+@router.get("/owner", response_model=list[SaveMenuResponse])
+async def get_owner_menus(
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    GET /menus/owner
+    Returns all menus belonging to the authenticated owner's restaurant.
+    Includes menu items for each menu.
+    """
+    restaurant_id = current_user.get("restaurant_id")
+    if not restaurant_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The authenticated user is not linked to any restaurant",
+        )
+
+    try:
+        supabase = get_supabase_client()
+        # Fetch all menus for the restaurant
+        menus_result = (
+            supabase.table("menus")
+            .select("*")
+            .eq("restaurant_id", restaurant_id)
+            .order("date", desc=True)
+            .execute()
+        )
+        
+        menus = menus_result.data or []
+        results = []
+
+        for menu in menus:
+            # Fetch items for this menu
+            items_result = (
+                supabase.table("menu_items")
+                .select("*")
+                .eq("menu_id", menu["id"])
+                .execute()
+            )
+            results.append({
+                "menu": menu,
+                "menu_items": items_result.data or [],
+            })
+
+        return results
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch owner menus: {e}",
+        )

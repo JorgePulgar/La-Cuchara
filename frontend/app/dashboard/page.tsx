@@ -199,33 +199,78 @@ export default function DashboardPage() {
                                                 )}
 
                                                 {selectedMenu.items.length === 0 ? (
-                                                    <p className="text-gray-500 text-sm">
+                                                    <p className="text-gray-500 text-sm italic">
                                                         No hay platos registrados para hoy.
                                                     </p>
                                                 ) : (
-                                                    <ul className="divide-y divide-gray-100">
-                                                        {selectedMenu.items.map((item) => (
-                                                            <li key={item.id} className="py-3">
-                                                                <div className="flex justify-between">
-                                                                    <div>
-                                                                        <p className="font-medium text-gray-900">
-                                                                            {item.name}
-                                                                        </p>
-                                                                        {item.description && (
-                                                                            <p className="text-sm text-gray-500 mt-0.5">
-                                                                                {item.description}
-                                                                            </p>
-                                                                        )}
-                                                                    </div>
-                                                                    {item.price != null && (
-                                                                        <span className="font-semibold text-gray-800 ml-3 flex-shrink-0">
-                                                                            {item.price.toFixed(2)} €
-                                                                        </span>
-                                                                    )}
+                                                    <div className="space-y-6">
+                                                        {/* Section grouping: Primeros, Segundos, Otros */}
+                                                        {[
+                                                            { label: "Primeros", filter: "primero" },
+                                                            { label: "Segundos", filter: "segundo" },
+                                                            { label: "Otros", filter: null }
+                                                        ].map((section) => {
+                                                            const items = selectedMenu.items.filter(item => {
+                                                                const course = item.tags ? (item.tags as any).course : null;
+                                                                if (section.filter === null) {
+                                                                    return course !== "primero" && course !== 'segundo';
+                                                                }
+                                                                return course === section.filter;
+                                                            });
+
+                                                            if (items.length === 0) return null;
+
+                                                            return (
+                                                                <div key={section.label}>
+                                                                    <h4 className="text-xs font-bold text-amber-600 uppercase tracking-widest mb-3 border-b border-amber-50 pb-1">
+                                                                        {section.label}
+                                                                    </h4>
+                                                                    <ul className="divide-y divide-gray-50">
+                                                                        {items.map((item) => (
+                                                                            <li key={item.id} className="py-2.5">
+                                                                                <div className="flex justify-between items-start">
+                                                                                    <div>
+                                                                                        <p className="font-semibold text-black">
+                                                                                            {item.name}
+                                                                                        </p>
+                                                                                        {item.description && (
+                                                                                            <p className="text-sm text-gray-800 mt-1 leading-relaxed">
+                                                                                                {item.description}
+                                                                                            </p>
+                                                                                        )}
+                                                                                    </div>
+                                                                                    {item.price != null && (
+                                                                                        <span className="font-bold text-gray-900 ml-3 bg-gray-50 px-2 py-1 rounded text-sm">
+                                                                                            {item.price.toFixed(2)} €
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
                                                                 </div>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
+                                                            );
+                                                        })}
+
+                                                        {/* Inclusion Badges */}
+                                                        <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100">
+                                                            {!!selectedMenu.parsed_json?.MenuBreadIncluded && (
+                                                                <span className="bg-orange-50 text-orange-700 px-2.5 py-1 rounded-full text-xs font-bold border border-orange-100">
+                                                                    🍞 Pan incluido
+                                                                </span>
+                                                            )}
+                                                            {!!selectedMenu.parsed_json?.MenuDessertIncluded && (
+                                                                <span className="bg-pink-50 text-pink-700 px-2.5 py-1 rounded-full text-xs font-bold border border-pink-100">
+                                                                    🍮 Postre incluido
+                                                                </span>
+                                                            )}
+                                                            {!!selectedMenu.parsed_json?.MenuDrinkIncluded && (
+                                                                <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs font-bold border border-blue-100">
+                                                                    🥤 Bebida incluida
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 )}
                                             </>
                                         ) : null}

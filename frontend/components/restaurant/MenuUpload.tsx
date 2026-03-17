@@ -7,7 +7,7 @@
  * Displays extracted fields, descriptions, and detected items.
  */
 
-import { useState, type FormEvent, type ChangeEvent } from "react";
+import { useState, useEffect, type FormEvent, type ChangeEvent } from "react";
 import {
     analyzeMenuImage,
     saveMenu,
@@ -47,12 +47,22 @@ function getTodayISODate(): string {
     return localDate.toISOString().slice(0, 10);
 }
 
-function getCurrentSeason(): string {
-    const month = new Date().getMonth(); // 0-indexed
-    if (month >= 2 && month <= 4) return "Primavera";
-    if (month >= 5 && month <= 7) return "Verano";
-    if (month >= 8 && month <= 10) return "Otoño";
-    return "Invierno";
+function getCurrentSeason(dateStr?: string): string {
+    // If dateStr is YYYY-MM-DD, parsing it as new Date(dateStr) might use UTC.
+    // We want local month.
+    let d: Date;
+    if (dateStr) {
+        const [y, m, d_num] = dateStr.split('-').map(Number);
+        d = new Date(y, m - 1, d_num);
+    } else {
+        d = new Date();
+    }
+
+    const month = d.getMonth(); // 0-indexed: 0=Jan, 1=Feb, 2=Mar...
+    if (month >= 2 && month <= 4) return "Primavera"; // Mar, Apr, May
+    if (month >= 5 && month <= 7) return "Verano";    // Jun, Jul, Aug
+    if (month >= 8 && month <= 10) return "Otoño";   // Sep, Oct, Nov
+    return "Invierno"; // Dec, Jan, Feb
 }
 
 function prettifyFieldName(fieldName: string): string {
@@ -179,6 +189,11 @@ export default function MenuUpload() {
         useState<ImageAnalysisResponse | null>(null);
     const [editableFields, setEditableFields] = useState<EditableMenuField[]>([]);
     const [editableMenuItems, setEditableMenuItems] = useState<EditableMenuItem[]>([]);
+
+    // Auto-select season when date changes (Phase 12 requirement)
+    useEffect(() => {
+        setSeasonTag(getCurrentSeason(menuDate));
+    }, [menuDate]);
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
