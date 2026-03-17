@@ -3,29 +3,61 @@
 import Navbar from "@/components/layout/Navbar";
 import ProtectedRoute from "@/components/layout/ProtectedRoute";
 import { useEffect, useState } from "react";
-import { getOwnerMenus, type SaveMenuResponse } from "@/lib/api";
+import { getOwnerMenus, reuseMenu, type SaveMenuResponse } from "@/lib/api";
 import Link from "next/link";
 
 export default function OwnerDashboard() {
     const [menus, setMenus] = useState<SaveMenuResponse[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [showAll, setShowAll] = useState(false);
+    const [savingId, setSavingId] = useState<string | null>(null);
+
+    const fetchMenus = async () => {
+        try {
+            setLoading(true);
+            const data = await getOwnerMenus();
+            // Filter out empty menus (no items)
+            const filtered = data.filter(m => m.menu_items.length > 0);
+            setMenus(filtered);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Error al cargar los menús");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchMenus = async () => {
-            try {
-                const data = await getOwnerMenus();
-                // Filter out empty menus (no items)
-                const filtered = data.filter(m => m.menu_items.length > 0);
-                setMenus(filtered);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Error al cargar los menús");
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchMenus();
     }, []);
+
+    const handleReuse = async (menuData: SaveMenuResponse) => {
+        try {
+            setSavingId(menuData.menu.id);
+            setError("");
+
+            await reuseMenu(menuData.menu.id);
+
+            // Refresh to show the updated list
+            await fetchMenus();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Error al reutilizar el menú");
+        } finally {
+            setSavingId(null);
+        }
+    };
+
+    const now = new Date();
+    const todayStr = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const displayedMenus = showAll
+        ? menus
+        : menus.filter(m => {
+            const menuDate = new Date(m.menu.date);
+            return menuDate.getMonth() === currentMonth && menuDate.getFullYear() === currentYear;
+        });
 
     return (
         <ProtectedRoute requiredRole="owner">
@@ -43,6 +75,15 @@ export default function OwnerDashboard() {
                         >
                             + Subir nuevo menú
                         </Link>
+                    </div>
+
+                    <div className="flex justify-end mb-4">
+                        <button
+                            onClick={() => setShowAll(!showAll)}
+                            className="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors border border-gray-300 rounded-lg px-4 py-2 bg-white cursor-pointer hover:bg-gray-50 flex items-center gap-2 shadow-sm"
+                        >
+                            {showAll ? "Ocultar meses anteriores" : "Mostrar todos los menús"}
+                        </button>
                     </div>
 
                     {loading ? (
@@ -69,7 +110,7 @@ export default function OwnerDashboard() {
                         </div>
                     ) : (
                         <div className="grid gap-6">
-                            {menus.map((m) => (
+                            {displayedMenus.map((m) => (
                                 <div key={m.menu.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
                                     <div className="bg-gray-50/50 px-6 py-4 flex justify-between items-center border-b border-gray-100">
                                         <div className="flex items-center gap-4">
@@ -80,11 +121,46 @@ export default function OwnerDashboard() {
                                                     month: 'long'
                                                 })}
                                             </span>
+                                            {m.menu.date === todayStr && (
+                                                <span className="bg-green-100 text-green-800 text-[10px] uppercase tracking-wider font-black px-2 py-0.5 rounded">
+                                                    ✨ Menú de Hoy
+                                                </span>
+                                            )}
                                             {m.menu.season_tag && (
                                                 <span className="bg-amber-100 text-amber-800 text-[10px] uppercase tracking-wider font-black px-2 py-0.5 rounded">
                                                     {m.menu.season_tag}
                                                 </span>
                                             )}
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            {Boolean(m.menu.parsed_json?.MenuBreadIncluded) && (
+                                                <span className="bg-orange-100 text-orange-800 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-sm">
+                                                    🍞 Pan
+                                                </span>
+                                            )}
+                                            {Boolean(m.menu.parsed_json?.MenuDrinkIncluded) && (
+                                                <span className="bg-blue-100 text-blue-800 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-sm">
+                                                    🥤 Bebida
+                                                </span>
+                                            )}
+                                            {Boolean(m.menu.parsed_json?.MenuDessertIncluded) && (
+                                                <span className="bg-pink-100 text-pink-800 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-sm">
+                                                    🍮 Postre
+                                                </span>
+                                            )}
+                                            {/* Reuse Button */}
+                                            <button
+                                                onClick={() => handleReuse(m)}
+                                                disabled={savingId === m.menu.id}
+                                                className="ml-4 text-xs font-bold bg-white border-2 border-amber-600 text-amber-700 hover:bg-amber-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                            >
+                                                {savingId === m.menu.id ? (
+                                                    <>
+                                                        <span className="w-3 h-3 border-2 border-amber-700 border-t-transparent rounded-full animate-spin"></span>
+                                                        Guardando...
+                                                    </>
+                                                ) : "Reutilizar para hoy"}
+                                            </button>
                                         </div>
                                     </div>
                                     <div className="p-6">
@@ -115,7 +191,7 @@ export default function OwnerDashboard() {
                                                             } catch { }
                                                             return (
                                                                 <li key={item.id} className="text-sm text-black font-medium border-l-2 border-gray-100 pl-3">
-                                                                    {displayName}
+                                                                    {String(displayName)}
                                                                 </li>
                                                             );
                                                         })}
@@ -146,7 +222,7 @@ export default function OwnerDashboard() {
                                                             } catch { }
                                                             return (
                                                                 <li key={item.id} className="text-sm text-black font-medium border-l-2 border-gray-100 pl-3">
-                                                                    {displayName}
+                                                                    {String(displayName)}
                                                                 </li>
                                                             );
                                                         })}
