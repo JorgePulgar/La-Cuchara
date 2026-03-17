@@ -35,6 +35,7 @@ type EditableMenuItem = {
     id: string;
     value: string;
     confidence?: number;
+    course: "primero" | "segundo";
 };
 
 type UploadPhase = "idle" | "analyzing" | "ready";
@@ -44,6 +45,14 @@ function getTodayISODate(): string {
     const offset = now.getTimezoneOffset();
     const localDate = new Date(now.getTime() - offset * 60 * 1000);
     return localDate.toISOString().slice(0, 10);
+}
+
+function getCurrentSeason(): string {
+    const month = new Date().getMonth(); // 0-indexed
+    if (month >= 2 && month <= 4) return "Primavera";
+    if (month >= 5 && month <= 7) return "Verano";
+    if (month >= 8 && month <= 10) return "Otoño";
+    return "Invierno";
 }
 
 function prettifyFieldName(fieldName: string): string {
@@ -99,42 +108,68 @@ function normalizeFieldValue(field: AzureFieldValue): string {
     return field.valueString ? capitalizeOCRText(field.valueString) : "";
 }
 
+const MENU_ITEM_FIELD_NAMES = new Set(["MenuItems", "MenuItemsFirsts", "MenuItemsSeconds"]);
+
 function buildEditableFields(fields: Record<string, unknown>): EditableMenuField[] {
     return Object.entries(fields)
-        .filter(([key]) => key !== "MenuItems")
+        .filter(([key]) => !MENU_ITEM_FIELD_NAMES.has(key))
         .map(([key, rawField]) => {
-        const azureField = rawField as AzureFieldValue;
+            const azureField = rawField as AzureFieldValue;
 
-        return {
-            key,
-            label: prettifyFieldName(key),
-            value: normalizeFieldValue(azureField),
-            confidence: azureField.confidence,
-        };
+            return {
+                key,
+                label: prettifyFieldName(key),
+                value: normalizeFieldValue(azureField),
+                confidence: azureField.confidence,
+            };
         });
 }
 
 function buildEditableMenuItems(fields: Record<string, unknown>): EditableMenuItem[] {
-    const rawMenuItems = fields["MenuItems"] as AzureFieldValue | undefined;
-    const values = rawMenuItems?.valueArray ?? [];
+    const items: EditableMenuItem[] = [];
+    let index = 0;
 
-    return values.map((item, index) => {
-        const value =
-            (item.valueString ? capitalizeOCRText(item.valueString) : undefined) ??
-            (item.valueNumber !== undefined ? String(item.valueNumber) : "");
+    // Helper to extract items from a field array with a given course
+    const extractFromField = (
+        fieldName: string,
+        course: "primero" | "segundo",
+    ) => {
+        const raw = fields[fieldName] as AzureFieldValue | undefined;
+        const values = raw?.valueArray ?? [];
 
-        return {
-            id: `menu-item-${index}`,
-            value,
-            confidence: item.confidence,
-        };
-    });
+        for (const item of values) {
+            const value =
+                (item.valueString ? capitalizeOCRText(item.valueString) : undefined) ??
+                (item.valueNumber !== undefined ? String(item.valueNumber) : "");
+
+            items.push({
+                id: `menu-item-${index}`,
+                value,
+                confidence: item.confidence,
+                course,
+            });
+            index += 1;
+        }
+    };
+
+    // Read from the separated fields (Azure La_Cuchara_V2 format)
+    extractFromField("MenuItemsFirsts", "primero");
+    extractFromField("MenuItemsSeconds", "segundo");
+
+    // Fallback: also check the old generic "MenuItems" field
+    if (items.length === 0) {
+        extractFromField("MenuItems", "primero");
+    }
+
+    return items;
 }
+
+let nextManualItemId = 0;
 
 export default function MenuUpload() {
     const [menuDate, setMenuDate] = useState(getTodayISODate());
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const [seasonTag, setSeasonTag] = useState("");
+    const [seasonTag, setSeasonTag] = useState(getCurrentSeason());
     const [phase, setPhase] = useState<UploadPhase>("idle");
     const [success, setSuccess] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
@@ -209,8 +244,11 @@ export default function MenuUpload() {
         );
 
         const payloadItems = editableMenuItems
-            .map((item) => item.value.trim())
-            .filter(Boolean);
+            .filter((item) => item.value.trim())
+            .map((item) => JSON.stringify({
+                name: item.value.trim(),
+                course: item.course,
+            }));
 
         setSaving(true);
 
@@ -312,16 +350,20 @@ export default function MenuUpload() {
                                 htmlFor="season-tag"
                                 className="block text-sm font-medium text-gray-700 mb-1"
                             >
-                                Etiquetas de temporada
+                                Temporada
                             </label>
-                            <input
+                            <select
                                 id="season-tag"
-                                type="text"
                                 value={seasonTag}
                                 onChange={(e) => setSeasonTag(e.target.value)}
-                                placeholder="Ej: primavera, navidad"
                                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                            />
+                            >
+                                <option value="">Seleccionar temporada</option>
+                                <option value="Primavera">Primavera</option>
+                                <option value="Verano">Verano</option>
+                                <option value="Otoño">Otoño</option>
+                                <option value="Invierno">Invierno</option>
+                            </select>
                         </div>
                     </div>
 
@@ -371,35 +413,70 @@ export default function MenuUpload() {
                         </div>
                     )}
 
-                    {editableMenuItems.length > 0 && (
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-gray-900">
-                                Items del menu
-                            </h3>
-                            <p className="text-sm text-gray-600">
-                                Cada plato se puede corregir individualmente.
-                            </p>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                    Items del menú
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    Cada plato se puede corregir individualmente.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    nextManualItemId += 1;
+                                    setEditableMenuItems([
+                                        ...editableMenuItems,
+                                        {
+                                            id: `manual-item-${nextManualItemId}`,
+                                            value: "",
+                                            course: "primero",
+                                        },
+                                    ]);
+                                }}
+                                className="text-sm bg-amber-100 hover:bg-amber-200 text-amber-800 font-medium px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                            >
+                                + Añadir plato
+                            </button>
+                        </div>
 
-                            <div className="space-y-3">
-                                {editableMenuItems.map((item, index) => (
-                                    <div
-                                        key={item.id}
-                                        className="border border-gray-200 rounded-lg p-4 bg-gray-50"
-                                    >
-                                        <div className="flex items-center justify-between mb-2">
-                                            <label
-                                                htmlFor={`menu-item-${index}`}
-                                                className="text-sm font-medium text-gray-800"
-                                            >
-                                                Plato {index + 1}
-                                            </label>
+                        <div className="space-y-3">
+                            {editableMenuItems.map((item, index) => (
+                                <div
+                                    key={item.id}
+                                    className="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                                >
+                                    <div className="flex items-center justify-between mb-2">
+                                        <label
+                                            htmlFor={`menu-item-${index}`}
+                                            className="text-sm font-medium text-gray-800"
+                                        >
+                                            Plato {index + 1}
+                                        </label>
+                                        <div className="flex items-center gap-2">
                                             {typeof item.confidence === "number" && (
                                                 <span className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 text-blue-700">
                                                     {(item.confidence * 100).toFixed(1)}%
                                                 </span>
                                             )}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setEditableMenuItems(
+                                                        editableMenuItems.filter((_, i) => i !== index)
+                                                    );
+                                                }}
+                                                className="text-red-400 hover:text-red-600 text-lg cursor-pointer px-1"
+                                                title="Eliminar plato"
+                                            >
+                                                ✕
+                                            </button>
                                         </div>
+                                    </div>
 
+                                    <div className="flex gap-3">
                                         <input
                                             id={`menu-item-${index}`}
                                             type="text"
@@ -412,13 +489,35 @@ export default function MenuUpload() {
                                                 };
                                                 setEditableMenuItems(next);
                                             }}
-                                            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                            placeholder="Nombre del plato"
+                                            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                                         />
+                                        <select
+                                            value={item.course}
+                                            onChange={(e) => {
+                                                const next = [...editableMenuItems];
+                                                next[index] = {
+                                                    ...next[index],
+                                                    course: e.target.value as "primero" | "segundo",
+                                                };
+                                                setEditableMenuItems(next);
+                                            }}
+                                            className="w-32 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                                        >
+                                            <option value="primero">Primero</option>
+                                            <option value="segundo">Segundo</option>
+                                        </select>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
+
+                            {editableMenuItems.length === 0 && (
+                                <div className="text-center py-6 text-gray-400 text-sm">
+                                    No hay platos. Pulsa &quot;+ Añadir plato&quot; para empezar.
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
 
                     <div className="pt-2">
                         <div className="flex flex-col md:flex-row gap-3">
