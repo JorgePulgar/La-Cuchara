@@ -94,9 +94,9 @@ export default function SignupForm() {
                     <button
                         type="button"
                         onClick={() => setRole("user")}
-                        className={`py-2.5 px-4 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${role === "user"
-                            ? "bg-amber-600 text-white border-amber-600"
-                            : "bg-white text-gray-700 border-gray-300 hover:border-amber-400"
+                        className={`py-2.5 px-4 rounded-lg text-sm font-bold border-2 transition-all cursor-pointer ${role === "user"
+                            ? "bg-thunderbird-700 text-ecruwhite border-thunderbird-700 shadow-inner"
+                            : "bg-ecruwhite text-thunderbird-700 border-thunderbird-100 hover:border-thunderbird-700"
                             }`}
                     >
                         👤 Usuario
@@ -104,9 +104,9 @@ export default function SignupForm() {
                     <button
                         type="button"
                         onClick={() => setRole("owner")}
-                        className={`py-2.5 px-4 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${role === "owner"
-                            ? "bg-amber-600 text-white border-amber-600"
-                            : "bg-white text-gray-700 border-gray-300 hover:border-amber-400"
+                        className={`py-2.5 px-4 rounded-lg text-sm font-bold border-2 transition-all cursor-pointer ${role === "owner"
+                            ? "bg-thunderbird-700 text-ecruwhite border-thunderbird-700 shadow-inner"
+                            : "bg-ecruwhite text-thunderbird-700 border-thunderbird-100 hover:border-thunderbird-700"
                             }`}
                     >
                         🍽️ Restaurante
@@ -127,7 +127,7 @@ export default function SignupForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="tu@email.com"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                    className="w-full px-4 py-2.5 bg-ecruwhite/50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-thunderbird-700 focus:border-thunderbird-700 outline-none transition-all text-black placeholder:text-gray-400"
                     autoComplete="email"
                     disabled={loading}
                 />
@@ -146,7 +146,7 @@ export default function SignupForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-thunderbird-500 focus:border-thunderbird-500 outline-none transition-colors text-black placeholder:text-gray-500"
                     autoComplete="new-password"
                     disabled={loading}
                 />
@@ -165,7 +165,7 @@ export default function SignupForm() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-thunderbird-500 focus:border-thunderbird-500 outline-none transition-colors text-black placeholder:text-gray-500"
                     autoComplete="new-password"
                     disabled={loading}
                 />
@@ -187,7 +187,7 @@ export default function SignupForm() {
                             value={restaurantName}
                             onChange={(e) => setRestaurantName(e.target.value)}
                             placeholder="Mi Restaurante"
-                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-thunderbird-500 focus:border-thunderbird-500 outline-none transition-colors text-black placeholder:text-gray-500"
                             disabled={loading}
                         />
                     </div>
@@ -205,7 +205,7 @@ export default function SignupForm() {
                             value={restaurantAddress}
                             onChange={(e) => setRestaurantAddress(e.target.value)}
                             placeholder="Calle Gran Vía 1, Madrid"
-                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-thunderbird-500 focus:border-thunderbird-500 outline-none transition-colors text-black placeholder:text-gray-500"
                             disabled={loading}
                         />
                     </div>
@@ -223,7 +223,7 @@ export default function SignupForm() {
                             value={restaurantPhone}
                             onChange={(e) => setRestaurantPhone(e.target.value)}
                             placeholder="+34 612 345 678"
-                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-thunderbird-500 focus:border-thunderbird-500 outline-none transition-colors text-black placeholder:text-gray-500"
                             disabled={loading}
                         />
                     </div>
@@ -239,14 +239,14 @@ export default function SignupForm() {
             <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-medium py-2.5 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
+                className="w-full bg-thunderbird-700 text-ecruwhite border-2 border-thunderbird-700 hover:bg-thunderbird-800 disabled:opacity-50 font-bold py-3 rounded-lg shadow-md transition-all cursor-pointer disabled:cursor-not-allowed uppercase tracking-wider text-sm"
             >
                 {loading ? "Creando cuenta..." : "Crear cuenta"}
             </button>
 
             <p className="text-center text-sm text-gray-600">
                 ¿Ya tienes cuenta?{" "}
-                <Link href="/login" className="text-amber-600 hover:text-amber-700 font-medium">
+                <Link href="/login" className="text-thunderbird-600 hover:text-thunderbird-700 font-medium">
                     Iniciar sesión
                 </Link>
             </p>

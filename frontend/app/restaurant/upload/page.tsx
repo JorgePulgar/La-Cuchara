@@ -11,9 +11,9 @@ export default function UploadPage() {
     return (
         <ProtectedRoute requiredRole="owner">
             <Navbar />
-            <main className="min-h-screen bg-gray-50 px-4 py-12">
+            <main className="min-h-screen bg-ecruwhite px-4 py-12">
                 <div className="max-w-lg mx-auto">
-                    <div className="bg-white rounded-2xl shadow-lg p-8">
+                    <div className="bg-ecruwhite/80 rounded-2xl shadow-xl border-4 border-white/50 p-8 backdrop-blur-sm">
                         <h1 className="text-2xl font-bold text-gray-900 mb-2">
                             Subir menú
                         </h1>

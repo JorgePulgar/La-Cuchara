@@ -171,6 +171,125 @@ async def search_menu_items(
         )
 
     return results
+@router.get("/owner", response_model=list[SaveMenuResponse])
+async def get_owner_menus(
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    GET /menus/owner
+    Returns all menus belonging to the authenticated owner's restaurant.
+    Includes menu items for each menu.
+    """
+    restaurant_id = current_user.get("restaurant_id")
+    if not restaurant_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The authenticated user is not linked to any restaurant",
+        )
+
+    try:
+        supabase = get_supabase_client()
+        # Fetch all menus for the restaurant
+        menus_result = (
+            supabase.table("menus")
+            .select("*")
+            .eq("restaurant_id", restaurant_id)
+            .order("date", desc=True)
+            .execute()
+        )
+        
+        menus = menus_result.data or []
+        results = []
+
+        for menu in menus:
+            # Fetch items for this menu
+            items_result = (
+                supabase.table("menu_items")
+                .select("*")
+                .eq("menu_id", menu["id"])
+                .execute()
+            )
+            results.append({
+                "menu": menu,
+                "menu_items": items_result.data or [],
+            })
+
+        return results
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch owner menus: {e}",
+        )
+
+@router.post("/owner/{menu_id}/reuse", response_model=SaveMenuResponse)
+async def reuse_owner_menu(
+    menu_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    POST /menus/owner/{menu_id}/reuse
+    Updates the date of an existing menu to today.
+    Ensures the menu belongs to the authenticated owner's restaurant.
+    """
+    restaurant_id = current_user.get("restaurant_id")
+    if not restaurant_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The authenticated user is not linked to any restaurant",
+        )
+
+    try:
+        supabase = get_supabase_client()
+        
+        # 1. Verify existence and ownership
+        menu_result = (
+            supabase.table("menus")
+            .select("*")
+            .eq("id", menu_id)
+            .eq("restaurant_id", restaurant_id)
+            .limit(1)
+            .execute()
+        )
+        
+        if not menu_result.data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Menu not found or you do not have permission to modify it",
+            )
+            
+        # 2. Update date to today
+        from datetime import date
+        today_str = date.today().isoformat()
+        
+        update_result = (
+            supabase.table("menus")
+            .update({"date": today_str})
+            .eq("id", menu_id)
+            .execute()
+        )
+        
+        updated_menu = update_result.data[0]
+        
+        # 3. Fetch its items to return the full payload
+        items_result = (
+            supabase.table("menu_items")
+            .select("*")
+            .eq("menu_id", menu_id)
+            .execute()
+        )
+        
+        return {
+            "menu": updated_menu,
+            "menu_items": items_result.data or []
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to reuse owner menu: {e}",
+        )
 
 @router.post(
     "/predictions",

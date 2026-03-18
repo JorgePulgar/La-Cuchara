@@ -69,7 +69,7 @@ export default function LoginForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="tu@email.com"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                    className="w-full px-4 py-2.5 bg-ecruwhite/50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-thunderbird-700 focus:border-thunderbird-700 outline-none transition-all text-black placeholder:text-gray-400"
                     autoComplete="email"
                     disabled={loading}
                 />
@@ -88,7 +88,7 @@ export default function LoginForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-thunderbird-500 focus:border-thunderbird-500 outline-none transition-colors text-black placeholder:text-gray-500"
                     autoComplete="current-password"
                     disabled={loading}
                 />
@@ -103,14 +103,14 @@ export default function LoginForm() {
             <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-medium py-2.5 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
+                className="w-full bg-thunderbird-700 text-ecruwhite border-2 border-thunderbird-700 hover:bg-thunderbird-800 disabled:opacity-50 font-bold py-3 rounded-lg shadow-md transition-all cursor-pointer disabled:cursor-not-allowed uppercase tracking-wider text-sm"
             >
                 {loading ? "Iniciando sesión..." : "Iniciar sesión"}
             </button>
 
             <p className="text-center text-sm text-gray-600">
                 ¿No tienes cuenta?{" "}
-                <Link href="/signup" className="text-amber-600 hover:text-amber-700 font-medium">
+                <Link href="/signup" className="text-thunderbird-600 hover:text-thunderbird-700 font-medium">
                     Crear cuenta
                 </Link>
             </p>

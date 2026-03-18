@@ -23,9 +23,9 @@ export default function RestaurantList({
 }: RestaurantListProps) {
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600" />
-                <span className="ml-3 text-gray-500">Buscando restaurantes...</span>
+            <div className="flex flex-col items-center justify-center py-20 bg-ecruwhite rounded-2xl border-2 border-thunderbird-100 shadow-inner">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-thunderbird-100 border-t-thunderbird-700 shadow-sm" />
+                <span className="mt-4 text-sm font-bold text-thunderbird-700 uppercase tracking-widest">Buscando restaurantes...</span>
             </div>
         );
     }

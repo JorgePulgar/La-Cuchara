@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
+
 /**
  * frontend/components/location/LocationInput.tsx
  * Lets the user set their location via browser geolocation or manual address input.
+ * Uses the new Thunderbird and Ecruwhite palette.
  */
-
-import { useState } from "react";
 
 interface LocationInputProps {
     onLocationSet: (lat: number, lon: number) => void;
@@ -84,54 +85,56 @@ export default function LocationInput({ onLocationSet }: LocationInputProps) {
     };
 
     return (
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-lg mx-auto">
-            <h2 className="text-xl font-bold text-gray-900 mb-2 text-center">
-                📍 ¿Dónde estás?
-            </h2>
-            <p className="text-gray-500 text-sm mb-6 text-center">
-                Necesitamos tu ubicación para encontrar restaurantes cercanos
-            </p>
-
-            {/* Option 1: Browser geolocation */}
-            <button
-                onClick={handleUseMyLocation}
-                disabled={loading}
-                className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white font-medium py-3 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed mb-4"
-            >
-                {loading ? "Obteniendo ubicación..." : "📍 Usar mi ubicación"}
-            </button>
-
-            <div className="flex items-center gap-3 my-4">
-                <div className="flex-1 border-t border-gray-200" />
-                <span className="text-gray-400 text-sm">o</span>
-                <div className="flex-1 border-t border-gray-200" />
-            </div>
-
-            {/* Option 2: Manual address */}
-            <div className="flex gap-2">
-                <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Escribe una dirección..."
-                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-colors text-black placeholder:text-gray-500"
-                    disabled={loading}
-                    onKeyDown={(e) => e.key === "Enter" && handleManualAddress()}
-                />
-                <button
-                    onClick={handleManualAddress}
-                    disabled={loading || !address.trim()}
-                    className="px-5 py-2.5 bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
-                >
-                    Buscar
-                </button>
+        <div className="bg-ecruwhite rounded-3xl border-4 border-thunderbird-100 shadow-2xl p-8 max-w-xl mx-auto">
+            <div className="text-center mb-8">
+                <h2 className="text-3xl font-brand text-thunderbird-700 mb-2">
+                    Encuentra comida cerca de ti
+                </h2>
+                <p className="text-sm font-medium text-gray-500">
+                    Establece tu ubicación para descubrir los mejores menús del día.
+                </p>
             </div>
 
             {error && (
-                <div className="mt-4 bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg border border-red-200">
-                    {error}
+                <div className="bg-thunderbird-50 text-thunderbird-800 text-sm px-4 py-3 rounded-xl border border-thunderbird-200 mb-6">
+                    ⚠️ {error}
                 </div>
             )}
+
+            <div className="space-y-6">
+                <button
+                    onClick={handleUseMyLocation}
+                    disabled={loading}
+                    className="w-full bg-thunderbird-700 hover:bg-thunderbird-800 disabled:opacity-50 text-ecruwhite font-black uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                >
+                    📍 {loading ? "Obteniendo ubicación..." : "Usar mi ubicación actual"}
+                </button>
+
+                <div className="relative flex items-center gap-4 py-2">
+                    <div className="flex-1 h-px bg-gray-200"></div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">O ingresa tu dirección</span>
+                    <div className="flex-1 h-px bg-gray-200"></div>
+                </div>
+
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Ej: Calle Gran Vía, Madrid"
+                        className="flex-1 w-full px-4 py-3 bg-ecruwhite/50 border-2 border-ecruwhite rounded-xl focus:ring-2 focus:ring-thunderbird-700 focus:border-thunderbird-700 outline-none transition-all text-black placeholder:text-gray-300 font-medium"
+                        disabled={loading}
+                        onKeyDown={(e) => e.key === "Enter" && handleManualAddress()}
+                    />
+                    <button
+                        onClick={handleManualAddress}
+                        disabled={loading || !address.trim()}
+                        className="bg-ecruwhite text-thunderbird-700 border-2 border-thunderbird-700 hover:bg-white disabled:opacity-50 font-black uppercase tracking-widest text-sm px-6 py-3 rounded-xl shadow-sm transition-all cursor-pointer"
+                    >
+                        Buscar
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

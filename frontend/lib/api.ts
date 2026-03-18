@@ -402,3 +402,18 @@ export async function searchMenuItems(
     });
     return apiFetch<MenuItemSearchResult[]>(`/menus/search?${params.toString()}`);
 }
+/**
+ * GET /menus/owner
+ */
+export async function getOwnerMenus(): Promise<SaveMenuResponse[]> {
+    return apiFetch<SaveMenuResponse[]>("/menus/owner");
+}
+
+/**
+ * POST /menus/owner/{menu_id}/reuse
+ */
+export async function reuseMenu(menuId: string): Promise<SaveMenuResponse> {
+    return apiFetch<SaveMenuResponse>(`/menus/owner/${menuId}/reuse`, {
+        method: "POST",
+    });
+}

@@ -23,8 +23,8 @@ export default function FiltersPanel({
     onHasMenuTodayChange,
 }: FiltersPanelProps) {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h3 className="text-sm font-semibold text-gray-800 mb-4 uppercase tracking-wide">
+        <div className="bg-ecruwhite rounded-2xl border-4 border-thunderbird-100 p-6 shadow-xl">
+            <h3 className="text-sm font-black text-thunderbird-700 mb-6 uppercase tracking-widest">
                 Filtros
             </h3>
 
@@ -32,7 +32,7 @@ export default function FiltersPanel({
             <div className="mb-5">
                 <label className="flex justify-between text-sm text-gray-700 mb-1.5">
                     <span>Distancia máxima</span>
-                    <span className="font-medium text-amber-700">{radiusKm} km</span>
+                    <span className="font-medium text-thunderbird-700">{radiusKm} km</span>
                 </label>
                 <input
                     type="range"
@@ -41,7 +41,7 @@ export default function FiltersPanel({
                     step={1}
                     value={radiusKm}
                     onChange={(e) => onRadiusChange(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-600"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-thunderbird-700"
                 />
                 <div className="flex justify-between text-xs text-gray-400 mt-1">
                     <span>1 km</span>
@@ -59,9 +59,9 @@ export default function FiltersPanel({
                         <button
                             key={star}
                             onClick={() => onMinRatingChange(minRating === star ? null : star)}
-                            className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-medium transition-colors cursor-pointer ${minRating !== null && star <= minRating
-                                    ? "bg-amber-500 text-white"
-                                    : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                            className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold transition-all cursor-pointer shadow-sm ${minRating !== null && star <= minRating
+                                    ? "bg-thunderbird-700 text-ecruwhite scale-110"
+                                    : "bg-ecruwhite text-thunderbird-700 border border-thunderbird-100 hover:border-thunderbird-700"
                                 }`}
                         >
                             {star}⭐
@@ -75,7 +75,7 @@ export default function FiltersPanel({
                 <span className="text-sm text-gray-700">Solo con menú hoy</span>
                 <button
                     onClick={() => onHasMenuTodayChange(!hasMenuToday)}
-                    className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer ${hasMenuToday ? "bg-amber-600" : "bg-gray-300"
+                    className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer ${hasMenuToday ? "bg-thunderbird-700" : "bg-gray-300"
                         }`}
                 >
                     <span
