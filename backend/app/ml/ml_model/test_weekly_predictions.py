@@ -67,8 +67,8 @@ def main() -> None:
         training_df=df,
         restaurant_id=restaurant_id,
         season_tag=season_tag,
-        top_firsts=4,
-        top_seconds=4,
+        top_firsts=3,
+        top_seconds=3,
     )
 
     print_week_menu(week_menu)

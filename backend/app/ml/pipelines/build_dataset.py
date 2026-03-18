@@ -53,7 +53,7 @@ df = df[df["normalized_name"] != "unknown"]
 # -----------------------------
 # Export del dataset base
 # -----------------------------
-df.to_csv("menu_items_training.csv", index=False)
+df.to_csv("../data/raw/menu_items_training.csv", index=False)
 
 print("Dataset base generado:")
 print(df.head())
@@ -84,7 +84,7 @@ dish_stats["avg_rating"] = dish_stats["avg_rating"].round(2)
 # Opcional: si quieres imputar platos sin rating con un valor neutro
 # dish_stats["avg_rating"] = dish_stats["avg_rating"].fillna(0)
 
-dish_stats.to_csv("data/dish_stats.csv", index=False)
+dish_stats.to_csv("../data/interim/dish_stats.csv", index=False)
 
 print("\nDish stats generado:")
 print(dish_stats.head())

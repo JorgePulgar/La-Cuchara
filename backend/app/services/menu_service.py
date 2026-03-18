@@ -1,14 +1,11 @@
-"""
-backend/app/services/menu_service.py
-Persistence logic for corrected menu analysis results.
-"""
-
 from __future__ import annotations
 
 import json
 from datetime import date
 from typing import Any
 from pathlib import Path
+
+import pandas as pd
 
 from app.core.supabase import get_supabase_admin_client
 
@@ -101,38 +98,74 @@ def infer_season_from_date(target_date: date) -> str:
         return "verano"
     return "otono"
 
-async def create_weekly_prediction(
-    current_user: dict,
+
+async def get_existing_weekly_prediction(
+    restaurant_id: str,
     week_start_date: date,
-) -> dict[str, Any]:
-    restaurant_id = current_user.get("restaurant_id")
-    if not restaurant_id:
-        raise ValueError("The authenticated user is not linked to any restaurant")
-
-    season_tag = infer_season_from_date(week_start_date)
+) -> dict[str, Any] | None:
+    supabase = get_supabase_admin_client()
 
     try:
-        from backend.app.ml.services.weekly_prediction_service import generate_weekly_predictions
-    except Exception as exc:
-        raise RuntimeError(f"Failed to import prediction module: {exc}") from exc
-
-    try:
-        predicted_menu_items = generate_weekly_predictions(
-            restaurant_id=str(restaurant_id),
-            season_tag=season_tag,
-            input_file=str(RANKED_FILE),
+        response = (
+            supabase.table("predictions")
+            .select("*")
+            .eq("restaurant_id", restaurant_id)
+            .eq("week_start_date", week_start_date.isoformat())
+            .order("id", desc=True)
+            .limit(1)
+            .execute()
         )
     except Exception as exc:
-        raise RuntimeError(f"Failed to generate weekly predictions: {exc}") from exc
+        raise RuntimeError(f"Failed to fetch existing prediction: {exc}") from exc
 
+    data = response.data or []
+    return data[0] if data else None
+
+
+async def get_menu_items_training_df_for_restaurant(
+    restaurant_id: str,
+) -> pd.DataFrame:
+    supabase = get_supabase_admin_client()
+
+    try:
+        response = (
+            supabase.table("menu_items_training")
+            .select("*")
+            .eq("restaurant_id", restaurant_id)
+            .execute()
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Failed to fetch training data: {exc}") from exc
+
+    data = response.data or []
+    if not data:
+        raise ValueError(
+            f"No training data found in menu_items_training for restaurant_id={restaurant_id}"
+        )
+
+    df = pd.DataFrame(data)
+    if df.empty:
+        raise ValueError(
+            f"Training dataframe is empty for restaurant_id={restaurant_id}"
+        )
+
+    return df
+
+
+async def save_weekly_prediction(
+    restaurant_id: str,
+    week_start_date: date,
+    predicted_menu_items: dict[str, Any],
+    model_version: str,
+) -> dict[str, Any]:
     supabase = get_supabase_admin_client()
 
     payload = {
-        "restaurant_id": str(restaurant_id),
+        "restaurant_id": restaurant_id,
         "week_start_date": week_start_date.isoformat(),
         "predicted_menu_items": predicted_menu_items,
         "predicted_services": None,
-        "model_version": "ranking_v1",
+        "model_version": model_version,
     }
 
     try:
@@ -147,5 +180,63 @@ async def create_weekly_prediction(
     prediction_data = response.data[0] if response.data else None
     if prediction_data is None:
         raise RuntimeError("Prediction insert succeeded but no data was returned")
+
+    return prediction_data
+
+
+async def create_weekly_prediction(
+    current_user: dict,
+    week_start_date: date,
+) -> dict[str, Any]:
+    restaurant_id = current_user.get("restaurant_id")
+    if not restaurant_id:
+        raise ValueError("The authenticated user is not linked to any restaurant")
+
+    if week_start_date.weekday() != 0:
+        raise ValueError("week_start_date must be a Monday")
+
+    restaurant_id = str(restaurant_id)
+
+    # 1) Si ya existe, devolverla directamente
+    existing_prediction = await get_existing_weekly_prediction(
+        restaurant_id=restaurant_id,
+        week_start_date=week_start_date,
+    )
+    if existing_prediction is not None:
+        return existing_prediction
+
+    # 2) Si no existe, generar con el modelo ML
+    season_tag = infer_season_from_date(week_start_date)
+
+    try:
+        from app.ml.ml_model.predict_weekly_menu import generate_weekly_predictions_ml
+    except Exception as exc:
+        raise RuntimeError(f"Failed to import ML prediction module: {exc}") from exc
+
+    training_df = await get_menu_items_training_df_for_restaurant(restaurant_id)
+
+    try:
+        predicted_menu_items = generate_weekly_predictions_ml(
+            training_df=training_df,
+            restaurant_id=restaurant_id,
+            season_tag=season_tag,
+            top_firsts=3,
+            top_seconds=3,
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Failed to generate ML weekly predictions: {exc}") from exc
+
+    model_version = predicted_menu_items.get(
+        "model_version",
+        "rf_binary_candidate_ranker_v1",
+    )
+
+    # 3) Guardar y devolver
+    prediction_data = await save_weekly_prediction(
+        restaurant_id=restaurant_id,
+        week_start_date=week_start_date,
+        predicted_menu_items=predicted_menu_items,
+        model_version=model_version,
+    )
 
     return prediction_data

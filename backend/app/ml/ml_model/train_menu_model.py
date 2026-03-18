@@ -51,6 +51,9 @@ FEATURE_COLUMNS = [
     "usage_rate_global",
     "usage_rate_same_weekday",
     "usage_rate_same_season",
+    "used_same_weekday_last_week",
+	"used_same_weekday_last_2_weeks",
+	"used_same_weekday_last_3_weeks",
 ]
 
 
@@ -78,6 +81,9 @@ def build_model_pipeline(model_type: str = "rf") -> Pipeline:
         "usage_rate_global",
         "usage_rate_same_weekday",
         "usage_rate_same_season",
+        "used_same_weekday_last_week",
+		"used_same_weekday_last_2_weeks",
+		"used_same_weekday_last_3_weeks",
     ]
 
     preprocessor = ColumnTransformer(
@@ -105,7 +111,7 @@ def build_model_pipeline(model_type: str = "rf") -> Pipeline:
         ]
     )
 
-    if model_type == "logreg":
+    if model_type == "rf":
         model = LogisticRegression(
             max_iter=1000,
             class_weight="balanced",
@@ -147,7 +153,7 @@ def temporal_train_test_split(
 def train_from_dataframe(
     training_df: pd.DataFrame,
     model_type: str = "rf",
-    max_history_days: int | None = 120,
+    max_history_days: int | None = None,
     test_days: int = 28,
     save_supervised_dataset: bool = True,
 ) -> dict:
@@ -197,8 +203,8 @@ def train_from_dataframe(
     }
 
     model_version = (
-        "logreg_binary_candidate_ranker_v1"
-        if model_type == "logreg"
+        "rf_binary_candidate_ranker_v1"
+        if model_type == "rf"
         else "rf_binary_candidate_ranker_v1"
     )
 
@@ -229,7 +235,7 @@ def train_from_dataframe(
 def train_from_csv(
     csv_path: str | Path,
     model_type: str = "rf",
-    max_history_days: int | None = 120,
+    max_history_days: int | None = None,
     test_days: int = 28,
 ) -> dict:
     df = pd.read_csv(csv_path)
@@ -253,8 +259,8 @@ if __name__ == "__main__":
     metadata = train_from_csv(
         csv_path=input_csv,
         model_type="rf",
-        max_history_days=120,
-        test_days=28,
+        max_history_days=None,
+        test_days=42,
     )
 
     print("Modelo entrenado correctamente")

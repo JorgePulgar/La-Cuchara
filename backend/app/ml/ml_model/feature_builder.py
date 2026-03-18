@@ -162,6 +162,16 @@ def build_candidate_features(
     usage_rate_same_weekday = times_used_same_weekday / total_hist_rows
     usage_rate_same_season = times_used_same_season / total_hist_rows
 
+    used_same_weekday_last_week = int(
+        (target_date - pd.Timedelta(days=7)) in dish_dates
+    )
+    used_same_weekday_last_2_weeks = int(
+        (target_date - pd.Timedelta(days=14)) in dish_dates
+    )
+    used_same_weekday_last_3_weeks = int(
+        (target_date - pd.Timedelta(days=21)) in dish_dates
+    )
+
     return {
         "restaurant_id": restaurant_id,
         "menu_date": pd.Timestamp(target_date),
@@ -183,6 +193,9 @@ def build_candidate_features(
         "usage_rate_global": usage_rate_global,
         "usage_rate_same_weekday": usage_rate_same_weekday,
         "usage_rate_same_season": usage_rate_same_season,
+        "used_same_weekday_last_week": used_same_weekday_last_week,
+        "used_same_weekday_last_2_weeks": used_same_weekday_last_2_weeks,
+        "used_same_weekday_last_3_weeks": used_same_weekday_last_3_weeks,
     }
 
 
@@ -250,12 +263,31 @@ def build_supervised_dataset(
         ["restaurant_id", "menu_date", "category", "normalized_name"]
     )
 
-    # 🚨 FILTRO CRÍTICO
+    # 1) Filtrar filas sin histórico útil
     supervised_df = supervised_df[
-        supervised_df["times_used_hist"] > 2
+        supervised_df["times_used_hist"] > 0
     ].copy()
 
     if supervised_df.empty:
         raise ValueError("Dataset vacío tras filtrar históricos")
 
-    return supervised_df.reset_index(drop=True)
+    # 2) Balancear clases: mantener todos los positivos y muestrear negativos
+    positives = supervised_df[supervised_df["target_selected"] == 1].copy()
+    negatives = supervised_df[supervised_df["target_selected"] == 0].copy()
+
+    if positives.empty:
+        raise ValueError("No hay ejemplos positivos tras el filtrado")
+
+    # ratio 1:3 -> por cada positivo, como mucho 3 negativos
+    max_negatives = len(positives) * 3
+
+    if len(negatives) > max_negatives:
+        negatives = negatives.sample(
+            n=max_negatives,
+            random_state=42,
+        )
+
+    supervised_df = pd.concat([positives, negatives], ignore_index=True)
+    supervised_df = supervised_df.sample(frac=1, random_state=42).reset_index(drop=True)
+
+    return supervised_df

@@ -493,6 +493,7 @@ def fetch_menu_items(client: Client) -> list[dict[str, Any]]:
         response = (
             client.table("menu_items")
             .select("id,name,normalized_name,category")
+            .is_("normalized_name", None)
             .range(start, end)
             .execute()
         )

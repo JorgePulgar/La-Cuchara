@@ -33,6 +33,9 @@ FEATURE_COLUMNS = [
     "usage_rate_global",
     "usage_rate_same_weekday",
     "usage_rate_same_season",
+	"used_same_weekday_last_week",
+	"used_same_weekday_last_2_weeks",
+	"used_same_weekday_last_3_weeks",
 ]
 
 
@@ -42,6 +45,7 @@ WEEKDAYS_ORDER = ["monday", "tuesday", "wednesday", "thursday", "friday"]
 # ---------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------
+
 
 def infer_season_tag(history_df: pd.DataFrame, target_date: pd.Timestamp) -> str:
     valid = history_df[history_df["date"] <= target_date].sort_values("date")
@@ -70,12 +74,14 @@ def build_next_week_dates() -> list[pd.Timestamp]:
 # Core ML scoring
 # ---------------------------------------------------------
 
+
 def build_candidate_score_table(
     training_df: pd.DataFrame,
     restaurant_id: str,
     target_date: pd.Timestamp,
     category: str,
     season_tag: str | None = None,
+    max_history_days: int | None = None,
 ) -> pd.DataFrame:
     df = normalize_training_df(training_df)
     model = load_menu_model()
@@ -87,12 +93,14 @@ def build_candidate_score_table(
     if season_tag is None:
         season_tag = infer_season_tag(restaurant_df, target_date)
 
-    candidate_pool = build_candidate_pool(restaurant_df)
-
-    candidates = candidate_pool[
-        (candidate_pool["restaurant_id"] == restaurant_id)
-        & (candidate_pool["category"] == category)
-    ]["normalized_name"].tolist()
+    candidates = (
+        restaurant_df[
+            (restaurant_df["category"] == category)
+            & (restaurant_df["date"] < target_date)
+        ]["normalized_name"]
+        .drop_duplicates()
+        .tolist()
+    )
 
     rows = []
 
@@ -104,7 +112,7 @@ def build_candidate_score_table(
             season_tag=season_tag,
             category=category,
             dish_name=dish,
-            max_history_days=None,
+            max_history_days=max_history_days,
         )
         rows.append(features)
 
@@ -113,9 +121,7 @@ def build_candidate_score_table(
 
     score_df = pd.DataFrame(rows)
 
-	# 🚨 FILTRO CRÍTICO
-    score_df = score_df[score_df["times_used_hist"] > 0]
-
+    score_df = score_df[score_df["times_used_hist"] > 0].copy()
     if score_df.empty:
         return pd.DataFrame()
 
@@ -127,14 +133,13 @@ def build_candidate_score_table(
     ).reset_index(drop=True)
 
     score_df["rank"] = range(1, len(score_df) + 1)
-
-
     return score_df
 
 
 # ---------------------------------------------------------
 # Selection logic (reuse baseline ideas)
 # ---------------------------------------------------------
+
 
 def pick_diverse_items(
     candidates: pd.DataFrame,
@@ -176,6 +181,7 @@ def pick_diverse_items(
 # ---------------------------------------------------------
 # MAIN FUNCTION (THIS IS WHAT YOU NEED)
 # ---------------------------------------------------------
+
 
 def generate_weekly_predictions_ml(
     training_df: pd.DataFrame,
