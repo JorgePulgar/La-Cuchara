@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-import json
 from datetime import date
 from typing import Any
-from pathlib import Path
 
 import pandas as pd
 
 from app.core.supabase import get_supabase_admin_client
-
-ML_DATA_DIR = Path(__file__).resolve().parents[1] / "ml" / "data"
-RANKED_FILE = ML_DATA_DIR / "ranked_predictions.csv"
 
 
 async def save_corrected_menu(
@@ -47,11 +42,7 @@ async def save_corrected_menu(
     }
 
     try:
-        menu_response = (
-            supabase.table("menus")
-            .insert(menu_payload)
-            .execute()
-        )
+        menu_response = supabase.table("menus").insert(menu_payload).execute()
     except Exception as exc:
         raise RuntimeError(f"Failed to save menu: {exc}") from exc
 
@@ -75,9 +66,7 @@ async def save_corrected_menu(
 
         try:
             items_response = (
-                supabase.table("menu_items")
-                .insert(item_payloads)
-                .execute()
+                supabase.table("menu_items").insert(item_payloads).execute()
             )
         except Exception as exc:
             raise RuntimeError(f"Failed to save menu items: {exc}") from exc
@@ -100,23 +89,27 @@ def infer_season_from_date(target_date: date) -> str:
 
 
 async def get_existing_weekly_prediction(
-    restaurant_id: str,
+    current_user: dict,
     week_start_date: date,
 ) -> dict[str, Any] | None:
+    restaurant_id = current_user.get("restaurant_id")
+    if not restaurant_id:
+        raise ValueError("The authenticated user is not linked to any restaurant")
+
     supabase = get_supabase_admin_client()
 
     try:
         response = (
             supabase.table("predictions")
             .select("*")
-            .eq("restaurant_id", restaurant_id)
+            .eq("restaurant_id", str(restaurant_id))
             .eq("week_start_date", week_start_date.isoformat())
             .order("id", desc=True)
             .limit(1)
             .execute()
         )
     except Exception as exc:
-        raise RuntimeError(f"Failed to fetch existing prediction: {exc}") from exc
+        raise RuntimeError(f"Failed to fetch prediction: {exc}") from exc
 
     data = response.data or []
     return data[0] if data else None
@@ -169,11 +162,7 @@ async def save_weekly_prediction(
     }
 
     try:
-        response = (
-            supabase.table("predictions")
-            .insert(payload)
-            .execute()
-        )
+        response = supabase.table("predictions").insert(payload).execute()
     except Exception as exc:
         raise RuntimeError(f"Failed to save prediction: {exc}") from exc
 
@@ -192,20 +181,20 @@ async def create_weekly_prediction(
     if not restaurant_id:
         raise ValueError("The authenticated user is not linked to any restaurant")
 
+    restaurant_id = str(restaurant_id)
+
     if week_start_date.weekday() != 0:
         raise ValueError("week_start_date must be a Monday")
 
-    restaurant_id = str(restaurant_id)
-
-    # 1) Si ya existe, devolverla directamente
+    # 1) Si ya existe, devolverla
     existing_prediction = await get_existing_weekly_prediction(
-        restaurant_id=restaurant_id,
+        current_user=current_user,
         week_start_date=week_start_date,
     )
     if existing_prediction is not None:
         return existing_prediction
 
-    # 2) Si no existe, generar con el modelo ML
+    # 2) Si no existe, generar con ML
     season_tag = infer_season_from_date(week_start_date)
 
     try:
@@ -220,8 +209,8 @@ async def create_weekly_prediction(
             training_df=training_df,
             restaurant_id=restaurant_id,
             season_tag=season_tag,
-            top_firsts=3,
-            top_seconds=3,
+            top_firsts=4,
+            top_seconds=4,
         )
     except Exception as exc:
         raise RuntimeError(f"Failed to generate ML weekly predictions: {exc}") from exc
@@ -232,11 +221,9 @@ async def create_weekly_prediction(
     )
 
     # 3) Guardar y devolver
-    prediction_data = await save_weekly_prediction(
+    return await save_weekly_prediction(
         restaurant_id=restaurant_id,
         week_start_date=week_start_date,
         predicted_menu_items=predicted_menu_items,
         model_version=model_version,
     )
-
-    return prediction_data
