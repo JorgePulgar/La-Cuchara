@@ -5,10 +5,15 @@ Persistence logic for corrected menu analysis results.
 
 from __future__ import annotations
 
+import json
 from datetime import date
 from typing import Any
+from pathlib import Path
 
 from app.core.supabase import get_supabase_admin_client
+
+ML_DATA_DIR = Path(__file__).resolve().parents[1] / "ml" / "data"
+RANKED_FILE = ML_DATA_DIR / "ranked_predictions.csv"
 
 
 async def save_corrected_menu(
@@ -83,3 +88,64 @@ async def save_corrected_menu(
         menu_items_data = items_response.data or []
 
     return menu_data, menu_items_data
+
+
+def infer_season_from_date(target_date: date) -> str:
+    month = target_date.month
+
+    if month in (12, 1, 2):
+        return "invierno"
+    if month in (3, 4, 5):
+        return "primavera"
+    if month in (6, 7, 8):
+        return "verano"
+    return "otono"
+
+async def create_weekly_prediction(
+    current_user: dict,
+    week_start_date: date,
+) -> dict[str, Any]:
+    restaurant_id = current_user.get("restaurant_id")
+    if not restaurant_id:
+        raise ValueError("The authenticated user is not linked to any restaurant")
+
+    season_tag = infer_season_from_date(week_start_date)
+
+    try:
+        from backend.app.ml.services.weekly_prediction_service import generate_weekly_predictions
+    except Exception as exc:
+        raise RuntimeError(f"Failed to import prediction module: {exc}") from exc
+
+    try:
+        predicted_menu_items = generate_weekly_predictions(
+            restaurant_id=str(restaurant_id),
+            season_tag=season_tag,
+            input_file=str(RANKED_FILE),
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Failed to generate weekly predictions: {exc}") from exc
+
+    supabase = get_supabase_admin_client()
+
+    payload = {
+        "restaurant_id": str(restaurant_id),
+        "week_start_date": week_start_date.isoformat(),
+        "predicted_menu_items": predicted_menu_items,
+        "predicted_services": None,
+        "model_version": "ranking_v1",
+    }
+
+    try:
+        response = (
+            supabase.table("predictions")
+            .insert(payload)
+            .execute()
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Failed to save prediction: {exc}") from exc
+
+    prediction_data = response.data[0] if response.data else None
+    if prediction_data is None:
+        raise RuntimeError("Prediction insert succeeded but no data was returned")
+
+    return prediction_data

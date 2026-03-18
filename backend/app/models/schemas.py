@@ -269,3 +269,35 @@ class RatingOut(BaseModel):
     rating: int
     comment: str | None = None
     ts: datetime
+
+
+# =============================================================================
+# Predictions
+# =============================================================================
+
+class PredictionGenerateRequest(BaseModel):
+    week_start_date: date
+
+
+class PredictedMenuItemOut(BaseModel):
+    normalized_name: str
+    score: float
+    rank: int
+    avg_units_sold: float
+    avg_rating: float
+    times_used: int
+
+
+class PredictedDayOut(BaseModel):
+    weekday: str
+    primeros: list[PredictedMenuItemOut] = []
+    segundos: list[PredictedMenuItemOut] = []
+
+
+class PredictionOut(BaseModel):
+    id: UUID | None = None
+    restaurant_id: UUID
+    week_start_date: date
+    predicted_menu_items: dict[str, Any]
+    predicted_services: int | None = None
+    model_version: str | None = None

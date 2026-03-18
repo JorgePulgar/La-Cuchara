@@ -40,10 +40,10 @@ from supabase import Client, create_client
 # CONFIG
 # =========================================================
 
-START_DATE = date(2025, 11, 1)
-END_DATE = date(2026, 2, 28)
+START_DATE = date(2025, 8, 1)
+END_DATE = date(2026, 3, 1)
 
-FIRSTS_PER_DAY = (3, 4)   # rango aleatorio
+FIRSTS_PER_DAY = (3, 4)  # rango aleatorio
 SECONDS_PER_DAY = (3, 4)
 
 CREATE_RATINGS = True
@@ -55,6 +55,7 @@ DRY_RUN = False
 # =========================================================
 # HELPERS
 # =========================================================
+
 
 def daterange(start: date, end: date):
     current = start
@@ -85,128 +86,140 @@ def weekday_name_es(d: date) -> str:
 
 def chunked(seq: list[dict[str, Any]], size: int):
     for i in range(0, len(seq), size):
-        yield seq[i:i + size]
+        yield seq[i : i + size]
 
 
 # =========================================================
 # MODELO DE PLATOS
 # =========================================================
 
+
 @dataclass
 class Dish:
     canonical: str
-    category: str   # primero | segundo
+    category: str  # primero | segundo
     variants: list[str]
     popularity: int  # base para ventas
     rating_base: float
 
 
 FIRST_DISHES = [
-    Dish("lentejas", "primero",
-         ["Lentejas", "Lentejas caseras", "Lentejas estofadas"], 48, 4.4),
-    Dish("fabada", "primero",
-         ["Fabada", "Fabada asturiana"], 40, 4.3),
-    Dish("cocido", "primero",
-         ["Cocido", "Cocido madrileño", "Cocido madrileno"], 50, 4.5),
-    Dish("garbanzos", "primero",
-         ["Garbanzos", "Garbanzos guisados"], 34, 4.0),
-    Dish("judias_verdes", "primero",
-         ["Judías verdes", "Judias verdes con jamón", "Judias verdes"], 26, 3.8),
-    Dish("sopa_castellana", "primero",
-         ["Sopa castellana"], 30, 4.1),
-    Dish("sopa_verduras", "primero",
-         ["Sopa de verduras"], 24, 3.9),
-    Dish("crema_verduras", "primero",
-         ["Crema de verduras"], 22, 3.9),
-    Dish("crema_calabaza", "primero",
-         ["Crema de calabaza"], 25, 4.0),
-    Dish("crema_calabacin", "primero",
-         ["Crema de calabacín", "Crema de calabacin"], 23, 3.9),
-    Dish("ensalada_mixta", "primero",
-         ["Ensalada mixta"], 28, 3.8),
-    Dish("ensalada_cesar", "primero",
-         ["Ensalada César", "Ensalada Cesar"], 26, 3.9),
-    Dish("ensalada_pasta", "primero",
-         ["Ensalada de pasta"], 22, 3.8),
-    Dish("ensalada_campera", "primero",
-         ["Ensalada campera"], 29, 4.0),
-    Dish("ensalada_arroz", "primero",
-         ["Ensalada de arroz"], 21, 3.8),
-    Dish("arroz_cubana", "primero",
-         ["Arroz a la cubana"], 33, 4.1),
-    Dish("arroz_tres_delicias", "primero",
-         ["Arroz tres delicias"], 27, 3.9),
-    Dish("paella", "primero",
-         ["Paella", "Paella mixta"], 44, 4.3),
-    Dish("arroz_pollo", "primero",
-         ["Arroz con pollo"], 36, 4.1),
-    Dish("macarrones", "primero",
-         ["Macarrones"], 31, 4.0),
-    Dish("macarrones_tomate", "primero",
-         ["Macarrones con tomate"], 28, 3.9),
-    Dish("macarrones_bolonesa", "primero",
-         ["Macarrones a la boloñesa", "Macarrones boloñesa", "Macarrones a la bolonesa"], 42, 4.3),
-    Dish("espaguetis_carbonara", "primero",
-         ["Espaguetis carbonara", "Espaguetis a la carbonara"], 35, 4.1),
-    Dish("espaguetis_bolonesa", "primero",
-         ["Espaguetis boloñesa", "Espaguetis a la boloñesa"], 33, 4.0),
-    Dish("pure_verduras", "primero",
-         ["Puré de verduras", "Pure de verduras"], 19, 3.8),
-    Dish("gazpacho", "primero",
-         ["Gazpacho"], 30, 4.0),
-    Dish("salmorejo", "primero",
-         ["Salmorejo"], 29, 4.1),
+    Dish(
+        "lentejas",
+        "primero",
+        ["Lentejas", "Lentejas caseras", "Lentejas estofadas"],
+        48,
+        4.4,
+    ),
+    Dish("fabada", "primero", ["Fabada", "Fabada asturiana"], 40, 4.3),
+    Dish(
+        "cocido", "primero", ["Cocido", "Cocido madrileño", "Cocido madrileno"], 50, 4.5
+    ),
+    Dish("garbanzos", "primero", ["Garbanzos", "Garbanzos guisados"], 34, 4.0),
+    Dish(
+        "judias_verdes",
+        "primero",
+        ["Judías verdes", "Judias verdes con jamón", "Judias verdes"],
+        26,
+        3.8,
+    ),
+    Dish("sopa_castellana", "primero", ["Sopa castellana"], 30, 4.1),
+    Dish("sopa_verduras", "primero", ["Sopa de verduras"], 24, 3.9),
+    Dish("crema_verduras", "primero", ["Crema de verduras"], 22, 3.9),
+    Dish("crema_calabaza", "primero", ["Crema de calabaza"], 25, 4.0),
+    Dish(
+        "crema_calabacin",
+        "primero",
+        ["Crema de calabacín", "Crema de calabacin"],
+        23,
+        3.9,
+    ),
+    Dish("ensalada_mixta", "primero", ["Ensalada mixta"], 28, 3.8),
+    Dish("ensalada_cesar", "primero", ["Ensalada César", "Ensalada Cesar"], 26, 3.9),
+    Dish("ensalada_pasta", "primero", ["Ensalada de pasta"], 22, 3.8),
+    Dish("ensalada_campera", "primero", ["Ensalada campera"], 29, 4.0),
+    Dish("ensalada_arroz", "primero", ["Ensalada de arroz"], 21, 3.8),
+    Dish("arroz_cubana", "primero", ["Arroz a la cubana"], 33, 4.1),
+    Dish("arroz_tres_delicias", "primero", ["Arroz tres delicias"], 27, 3.9),
+    Dish("paella", "primero", ["Paella", "Paella mixta"], 44, 4.3),
+    Dish("arroz_pollo", "primero", ["Arroz con pollo"], 36, 4.1),
+    Dish("macarrones", "primero", ["Macarrones"], 31, 4.0),
+    Dish("macarrones_tomate", "primero", ["Macarrones con tomate"], 28, 3.9),
+    Dish(
+        "macarrones_bolonesa",
+        "primero",
+        ["Macarrones a la boloñesa", "Macarrones boloñesa", "Macarrones a la bolonesa"],
+        42,
+        4.3,
+    ),
+    Dish(
+        "espaguetis_carbonara",
+        "primero",
+        ["Espaguetis carbonara", "Espaguetis a la carbonara"],
+        35,
+        4.1,
+    ),
+    Dish(
+        "espaguetis_bolonesa",
+        "primero",
+        ["Espaguetis boloñesa", "Espaguetis a la boloñesa"],
+        33,
+        4.0,
+    ),
+    Dish("pure_verduras", "primero", ["Puré de verduras", "Pure de verduras"], 19, 3.8),
+    Dish("gazpacho", "primero", ["Gazpacho"], 30, 4.0),
+    Dish("salmorejo", "primero", ["Salmorejo"], 29, 4.1),
 ]
 
 SECOND_DISHES = [
-    Dish("merluza_plancha", "segundo",
-         ["Merluza a la plancha", "Filete de merluza a la plancha"], 40, 4.2),
-    Dish("merluza_rebozada", "segundo",
-         ["Merluza rebozada"], 31, 4.0),
-    Dish("bacalao", "segundo",
-         ["Bacalao"], 28, 4.1),
-    Dish("bacalao_plancha", "segundo",
-         ["Bacalao a la plancha"], 27, 4.0),
-    Dish("pollo_asado", "segundo",
-         ["Pollo asado", "Pollo al horno"], 46, 4.3),
-    Dish("pollo_empanado", "segundo",
-         ["Pollo empanado", "Filete de pollo empanado"], 38, 4.1),
-    Dish("pollo_plancha", "segundo",
-         ["Pollo a la plancha", "Pechuga de pollo a la plancha"], 33, 4.0),
-    Dish("filete_ternera", "segundo",
-         ["Filete de ternera"], 37, 4.2),
-    Dish("ternera_plancha", "segundo",
-         ["Ternera a la plancha"], 29, 4.0),
-    Dish("escalope_ternera", "segundo",
-         ["Escalope de ternera"], 35, 4.1),
-    Dish("filete_empanado", "segundo",
-         ["Filete empanado"], 32, 4.0),
-    Dish("secreto_iberico", "segundo",
-         ["Secreto ibérico", "Secreto iberico"], 34, 4.3),
-    Dish("costillas_horno", "segundo",
-         ["Costillas al horno"], 36, 4.2),
-    Dish("chuletas_cerdo", "segundo",
-         ["Chuletas de cerdo"], 30, 3.9),
-    Dish("lomo_plancha", "segundo",
-         ["Lomo a la plancha"], 27, 3.8),
-    Dish("lomo_empanado", "segundo",
-         ["Lomo empanado"], 31, 3.9),
-    Dish("albondigas", "segundo",
-         ["Albóndigas", "Albóndigas en salsa", "Albondigas en salsa"], 39, 4.2),
-    Dish("hamburguesa", "segundo",
-         ["Hamburguesa", "Hamburguesa completa"], 28, 3.9),
-    Dish("tortilla_patata", "segundo",
-         ["Tortilla de patata"], 26, 4.0),
-    Dish("revuelto_setas", "segundo",
-         ["Revuelto de setas"], 22, 3.9),
-    Dish("calamares_romana", "segundo",
-         ["Calamares a la romana"], 29, 4.0),
-    Dish("boquerones_fritos", "segundo",
-         ["Boquerones fritos"], 25, 3.9),
-    Dish("pescado_dia", "segundo",
-         ["Pescado del día", "Pescado del dia"], 24, 3.9),
-    Dish("carne_dia", "segundo",
-         ["Carne del día", "Carne del dia"], 24, 3.9),
+    Dish(
+        "merluza_plancha",
+        "segundo",
+        ["Merluza a la plancha", "Filete de merluza a la plancha"],
+        40,
+        4.2,
+    ),
+    Dish("merluza_rebozada", "segundo", ["Merluza rebozada"], 31, 4.0),
+    Dish("bacalao", "segundo", ["Bacalao"], 28, 4.1),
+    Dish("bacalao_plancha", "segundo", ["Bacalao a la plancha"], 27, 4.0),
+    Dish("pollo_asado", "segundo", ["Pollo asado", "Pollo al horno"], 46, 4.3),
+    Dish(
+        "pollo_empanado",
+        "segundo",
+        ["Pollo empanado", "Filete de pollo empanado"],
+        38,
+        4.1,
+    ),
+    Dish(
+        "pollo_plancha",
+        "segundo",
+        ["Pollo a la plancha", "Pechuga de pollo a la plancha"],
+        33,
+        4.0,
+    ),
+    Dish("filete_ternera", "segundo", ["Filete de ternera"], 37, 4.2),
+    Dish("ternera_plancha", "segundo", ["Ternera a la plancha"], 29, 4.0),
+    Dish("escalope_ternera", "segundo", ["Escalope de ternera"], 35, 4.1),
+    Dish("filete_empanado", "segundo", ["Filete empanado"], 32, 4.0),
+    Dish("secreto_iberico", "segundo", ["Secreto ibérico", "Secreto iberico"], 34, 4.3),
+    Dish("costillas_horno", "segundo", ["Costillas al horno"], 36, 4.2),
+    Dish("chuletas_cerdo", "segundo", ["Chuletas de cerdo"], 30, 3.9),
+    Dish("lomo_plancha", "segundo", ["Lomo a la plancha"], 27, 3.8),
+    Dish("lomo_empanado", "segundo", ["Lomo empanado"], 31, 3.9),
+    Dish(
+        "albondigas",
+        "segundo",
+        ["Albóndigas", "Albóndigas en salsa", "Albondigas en salsa"],
+        39,
+        4.2,
+    ),
+    Dish("hamburguesa", "segundo", ["Hamburguesa", "Hamburguesa completa"], 28, 3.9),
+    Dish("tortilla_patata", "segundo", ["Tortilla de patata"], 26, 4.0),
+    Dish("revuelto_setas", "segundo", ["Revuelto de setas"], 22, 3.9),
+    Dish("calamares_romana", "segundo", ["Calamares a la romana"], 29, 4.0),
+    Dish("boquerones_fritos", "segundo", ["Boquerones fritos"], 25, 3.9),
+    Dish("pescado_dia", "segundo", ["Pescado del día", "Pescado del dia"], 24, 3.9),
+    Dish("carne_dia", "segundo", ["Carne del día", "Carne del dia"], 24, 3.9),
 ]
 
 
@@ -217,46 +230,123 @@ SECOND_DISHES = [
 SEASON_POOL = {
     "invierno": {
         "primero": [
-            "lentejas", "fabada", "cocido", "garbanzos", "sopa_castellana",
-            "sopa_verduras", "crema_verduras", "crema_calabaza", "crema_calabacin",
-            "judias_verdes", "macarrones_bolonesa", "paella"
+            "lentejas",
+            "fabada",
+            "cocido",
+            "garbanzos",
+            "sopa_castellana",
+            "sopa_verduras",
+            "crema_verduras",
+            "crema_calabaza",
+            "crema_calabacin",
+            "judias_verdes",
+            "macarrones_bolonesa",
+            "macarrones",
+            "macarrones_tomate",
+            "paella",
+            "arroz_pollo",
+            "arroz_cubana",
         ],
         "segundo": [
-            "pollo_asado", "pollo_empanado", "merluza_plancha", "albondigas",
-            "filete_ternera", "costillas_horno", "bacalao", "lomo_empanado",
-            "secreto_iberico", "calamares_romana"
+            "pollo_asado",
+            "pollo_empanado",
+            "pollo_plancha",
+            "merluza_plancha",
+            "albondigas",
+            "filete_ternera",
+            "filete_empanado",
+            "costillas_horno",
+            "bacalao",
+            "bacalao_plancha",
+            "lomo_empanado",
+            "lomo_plancha",
+            "secreto_iberico",
+            "calamares_romana",
+            "carne_dia",
+            "pescado_dia",
         ],
     },
     "primavera": {
         "primero": [
-            "ensalada_mixta", "ensalada_cesar", "ensalada_campera", "arroz_cubana",
-            "paella", "macarrones", "macarrones_tomate", "crema_verduras",
-            "judias_verdes", "arroz_tres_delicias"
+            "ensalada_mixta",
+            "ensalada_cesar",
+            "ensalada_campera",
+            "arroz_cubana",
+            "paella",
+            "macarrones",
+            "macarrones_tomate",
+            "crema_verduras",
+            "judias_verdes",
+            "arroz_tres_delicias",
         ],
         "segundo": [
-            "pollo_plancha", "merluza_plancha", "pollo_asado", "albondigas",
-            "hamburguesa", "bacalao_plancha", "tortilla_patata", "lomo_plancha"
+            "pollo_plancha",
+            "merluza_plancha",
+            "pollo_asado",
+            "albondigas",
+            "hamburguesa",
+            "bacalao_plancha",
+            "tortilla_patata",
+            "lomo_plancha",
         ],
     },
     "verano": {
         "primero": [
-            "gazpacho", "salmorejo", "ensalada_mixta", "ensalada_cesar",
-            "ensalada_pasta", "ensalada_arroz", "ensalada_campera",
-            "arroz_tres_delicias", "paella", "macarrones_tomate"
+            "gazpacho",
+            "salmorejo",
+            "ensalada_mixta",
+            "ensalada_cesar",
+            "ensalada_pasta",
+            "ensalada_arroz",
+            "ensalada_campera",
+            "arroz_tres_delicias",
+            "paella",
+            "macarrones_tomate",
         ],
         "segundo": [
-            "merluza_plancha", "pollo_plancha", "hamburguesa", "bacalao_plancha",
-            "tortilla_patata", "boquerones_fritos", "calamares_romana", "pollo_asado"
+            "merluza_plancha",
+            "pollo_plancha",
+            "hamburguesa",
+            "bacalao_plancha",
+            "tortilla_patata",
+            "boquerones_fritos",
+            "calamares_romana",
+            "pollo_asado",
         ],
     },
     "otono": {
         "primero": [
-            "lentejas", "crema_calabaza", "crema_verduras", "sopa_verduras",
-            "macarrones_bolonesa", "arroz_pollo", "judias_verdes", "paella"
+            "lentejas",
+            "fabada",
+            "garbanzos",
+            "crema_calabaza",
+            "crema_verduras",
+            "crema_calabacin",
+            "sopa_verduras",
+            "sopa_castellana",
+            "macarrones_bolonesa",
+            "macarrones",
+            "macarrones_tomate",
+            "arroz_pollo",
+            "arroz_cubana",
+            "judias_verdes",
+            "paella",
         ],
         "segundo": [
-            "pollo_asado", "merluza_plancha", "albondigas", "filete_empanado",
-            "chuletas_cerdo", "lomo_empanado", "carne_dia", "pescado_dia"
+            "pollo_asado",
+            "pollo_empanado",
+            "pollo_plancha",
+            "merluza_plancha",
+            "albondigas",
+            "filete_empanado",
+            "filete_ternera",
+            "chuletas_cerdo",
+            "lomo_empanado",
+            "lomo_plancha",
+            "costillas_horno",
+            "calamares_romana",
+            "carne_dia",
+            "pescado_dia",
         ],
     },
 }
@@ -265,6 +355,7 @@ SEASON_POOL = {
 # =========================================================
 # CLIENTE SUPABASE
 # =========================================================
+
 
 def build_client() -> Client:
     load_dotenv()
@@ -279,9 +370,11 @@ def build_client() -> Client:
 # CARGA DE DATOS REALES
 # =========================================================
 
+
 def fetch_restaurants(client: Client) -> list[dict[str, Any]]:
     res = client.table("restaurants").select("id,name").execute()
     return res.data or []
+
 
 def fetch_users(client: Client) -> list[dict[str, Any]]:
     res = client.table("users").select("id,restaurant_id,role").execute()
@@ -302,6 +395,7 @@ def fetch_normal_users(client: Client) -> list[dict[str, Any]]:
 # UTILIDADES DE NEGOCIO
 # =========================================================
 
+
 def dish_index(dishes: list[Dish]) -> dict[str, Dish]:
     return {d.canonical: d for d in dishes}
 
@@ -319,29 +413,33 @@ def restaurant_popularity_factor() -> float:
 
 
 def build_week_template_for_season(season: str) -> dict[str, dict[str, list[str]]]:
-    """
-    Devuelve una plantilla fija por temporada:
-    {
-      "lunes": {"primero": [...], "segundo": [...]},
-      ...
-    }
-    """
     pool_first = SEASON_POOL[season]["primero"][:]
     pool_second = SEASON_POOL[season]["segundo"][:]
-
-    random.shuffle(pool_first)
-    random.shuffle(pool_second)
 
     weekdays = ["lunes", "martes", "miercoles", "jueves", "viernes"]
     template: dict[str, dict[str, list[str]]] = {}
 
-    for i, wd in enumerate(weekdays):
+    used_first_week = {}
+    used_second_week = {}
+
+    for wd in weekdays:
         first_count = random.randint(*FIRSTS_PER_DAY)
         second_count = random.randint(*SECONDS_PER_DAY)
 
-        # rotación simple para que la semana tenga patrón estable
-        firsts = [pool_first[(i + j) % len(pool_first)] for j in range(first_count)]
-        seconds = [pool_second[(i + j) % len(pool_second)] for j in range(second_count)]
+        first_candidates = sorted(
+            pool_first, key=lambda d: (used_first_week.get(d, 0), random.random())
+        )
+        second_candidates = sorted(
+            pool_second, key=lambda d: (used_second_week.get(d, 0), random.random())
+        )
+
+        firsts = first_candidates[:first_count]
+        seconds = second_candidates[:second_count]
+
+        for d in firsts:
+            used_first_week[d] = used_first_week.get(d, 0) + 1
+        for d in seconds:
+            used_second_week[d] = used_second_week.get(d, 0) + 1
 
         template[wd] = {
             "primero": firsts,
@@ -351,22 +449,40 @@ def build_week_template_for_season(season: str) -> dict[str, dict[str, list[str]
     return template
 
 
-def maybe_swap_one_dish(dishes: list[str], pool: list[str], probability: float = 0.20) -> list[str]:
-    """
-    Pequeña variación semanal: a veces cambia 1 plato.
-    """
+def maybe_swap_some_dishes(
+    dishes: list[str],
+    pool: list[str],
+    swap_probability: float = 0.45,
+    max_swaps: int = 2,
+) -> list[str]:
     dishes = dishes[:]
-    if random.random() < probability and dishes:
-        idx = random.randrange(len(dishes))
-        replacement = random.choice(pool)
+
+    if not dishes or random.random() >= swap_probability:
+        return dishes
+
+    swaps = random.randint(1, min(max_swaps, len(dishes)))
+
+    available = [p for p in pool if p not in dishes]
+    if not available:
+        return dishes
+
+    idxs = random.sample(range(len(dishes)), k=swaps)
+
+    for idx in idxs:
+        candidates = [p for p in available if p not in dishes]
+        if not candidates:
+            break
+        replacement = random.choice(candidates)
         dishes[idx] = replacement
-    # evitar duplicados en la misma lista manteniendo orden
+
+    # quitar duplicados por seguridad
     seen = set()
     unique = []
     for d in dishes:
         if d not in seen:
             seen.add(d)
             unique.append(d)
+
     return unique
 
 
@@ -381,9 +497,19 @@ def sold_units_for_dish(
     # pequeños ajustes
     if weekday in ("jueves", "viernes"):
         base *= 1.08
-    if season == "invierno" and dish.canonical in {"lentejas", "fabada", "cocido", "sopa_castellana"}:
+    if season == "invierno" and dish.canonical in {
+        "lentejas",
+        "fabada",
+        "cocido",
+        "sopa_castellana",
+    }:
         base *= 1.15
-    if season == "verano" and dish.canonical in {"gazpacho", "salmorejo", "ensalada_mixta", "ensalada_cesar"}:
+    if season == "verano" and dish.canonical in {
+        "gazpacho",
+        "salmorejo",
+        "ensalada_mixta",
+        "ensalada_cesar",
+    }:
         base *= 1.12
 
     noise = random.uniform(0.85, 1.15)
@@ -417,6 +543,7 @@ def generate_rating_values(dish: Dish, sold_units: int) -> list[int]:
 # GENERACIÓN PRINCIPAL
 # =========================================================
 
+
 def build_owner_map(users: list[dict[str, Any]]) -> dict[str, str | None]:
     """
     restaurant_id -> owner_user_id si existe
@@ -432,7 +559,12 @@ def build_owner_map(users: list[dict[str, Any]]) -> dict[str, str | None]:
 def generate_synthetic_payloads(
     restaurants: list[dict[str, Any]],
     owner_map: dict[str, str | None],
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+]:
     """
     Devuelve payloads para:
     - menus
@@ -480,8 +612,12 @@ def generate_synthetic_payloads(
             second_pool = SEASON_POOL[season]["segundo"]
 
             # pequeñas variaciones semanales
-            chosen_firsts = maybe_swap_one_dish(template["primero"], first_pool, probability=0.18)
-            chosen_seconds = maybe_swap_one_dish(template["segundo"], second_pool, probability=0.18)
+            chosen_firsts = maybe_swap_some_dishes(
+                template["primero"], first_pool, swap_probability=0.45, max_swaps=2
+            )
+            chosen_seconds = maybe_swap_some_dishes(
+                template["segundo"], second_pool, swap_probability=0.45, max_swaps=2
+            )
 
             # construir menú
             menu_row = {
@@ -507,6 +643,7 @@ def generate_synthetic_payloads(
 # INSERTS
 # =========================================================
 
+
 def insert_menus_and_related(
     client: Client,
     menus_payload: list[dict[str, Any]],
@@ -518,7 +655,9 @@ def insert_menus_and_related(
     """
     user_ids = [u["id"] for u in normal_users]
     if not user_ids and CREATE_RATINGS:
-        print("No hay usuarios normales (role='user') en la tabla users; no se podrán crear ratings.")
+        print(
+            "No hay usuarios normales (role='user') en la tabla users; no se podrán crear ratings."
+        )
         user_ids = []
 
     core_menu_rows = []
@@ -570,7 +709,7 @@ def insert_menus_and_related(
                 "tags": None,
                 "predicted": False,
                 "normalized_name": None,  # lo rellena luego vuestro script
-                "category": None,         # lo rellena luego vuestro script
+                "category": None,  # lo rellena luego vuestro script
             }
             all_menu_items.append((item, dish, season, wd, restaurant_factor))
 
@@ -597,13 +736,17 @@ def insert_menus_and_related(
         if DRY_RUN:
             fake = []
             for row in batch:
-                fake.append({**row, "id": f"fake-item-{len(inserted_menu_items)+len(fake)+1}"})
+                fake.append(
+                    {**row, "id": f"fake-item-{len(inserted_menu_items)+len(fake)+1}"}
+                )
             inserted_menu_items.extend(fake)
         else:
             res = client.table("menu_items").insert(batch).execute()
             inserted_menu_items.extend(res.data or [])
 
-    for inserted_item, (_, dish, season, wd, restaurant_factor) in zip(inserted_menu_items, all_menu_items):
+    for inserted_item, (_, dish, season, wd, restaurant_factor) in zip(
+        inserted_menu_items, all_menu_items
+    ):
         sold_units = sold_units_for_dish(dish, restaurant_factor, season, wd)
         all_sales.append(
             {
@@ -615,7 +758,11 @@ def insert_menus_and_related(
 
         if CREATE_RATINGS and user_ids:
             rating_values = generate_rating_values(dish, sold_units)
-            chosen_users = random.sample(user_ids, k=min(len(user_ids), len(rating_values))) if rating_values else []
+            chosen_users = (
+                random.sample(user_ids, k=min(len(user_ids), len(rating_values)))
+                if rating_values
+                else []
+            )
 
             for value, user_id in zip(rating_values, chosen_users):
                 all_ratings.append(
@@ -646,6 +793,7 @@ def insert_menus_and_related(
 # =========================================================
 # MAIN
 # =========================================================
+
 
 def main() -> None:
     random.seed(42)

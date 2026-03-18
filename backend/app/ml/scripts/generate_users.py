@@ -38,7 +38,7 @@ from supabase import Client, create_client
 NUM_USERS = 20
 DRY_RUN = False
 RANDOM_SEED = 42
-EMAIL_DOMAIN = "lacuchara-users.local"
+EMAIL_DOMAIN = "lacuchara-users.dev"
 DEFAULT_USER_PASSWORD = "UserDemo123!"
 AUTO_CONFIRM_EMAIL = True
 

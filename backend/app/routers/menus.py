@@ -7,51 +7,57 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.dependencies import get_current_user
 from app.core.supabase import get_supabase_client
-from app.models.schemas import MenuItemSearchOut, SaveMenuRequest, SaveMenuResponse
+from app.models.schemas import (
+    MenuItemSearchOut,
+    SaveMenuRequest,
+    SaveMenuResponse,
+    PredictionGenerateRequest,
+    PredictionOut,
+)
 
 router = APIRouter()
 
 
 @router.post("", response_model=SaveMenuResponse, status_code=status.HTTP_201_CREATED)
 async def create_menu(
-	request: SaveMenuRequest,
-	current_user: dict = Depends(get_current_user),
+    request: SaveMenuRequest,
+    current_user: dict = Depends(get_current_user),
 ):
-	"""
-	Persists a corrected menu and its corrected menu items.
+    """
+    Persists a corrected menu and its corrected menu items.
 
-	The target restaurant is derived from the authenticated owner/admin user.
-	"""
-	if current_user.get("role") not in {"owner", "admin"}:
-		raise HTTPException(
-			status_code=status.HTTP_403_FORBIDDEN,
-			detail="Only owners and admins can save menus",
-		)
+    The target restaurant is derived from the authenticated owner/admin user.
+    """
+    if current_user.get("role") not in {"owner", "admin"}:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only owners and admins can save menus",
+        )
 
-	try:
-		from app.services.menu_service import save_corrected_menu
+    try:
+        from app.services.menu_service import save_corrected_menu
 
-		menu_data, menu_items_data = await save_corrected_menu(
-			current_user=current_user,
-			menu_date=request.date,
-			season_tag=request.season_tag,
-			fields=request.fields,
-			items=request.items,
-		)
-		return {
-			"menu": menu_data,
-			"menu_items": menu_items_data,
-		}
-	except ValueError as exc:
-		raise HTTPException(
-			status_code=status.HTTP_400_BAD_REQUEST,
-			detail=str(exc),
-		) from exc
-	except RuntimeError as exc:
-		raise HTTPException(
-			status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-			detail=str(exc),
-		) from exc
+        menu_data, menu_items_data = await save_corrected_menu(
+            current_user=current_user,
+            menu_date=request.date,
+            season_tag=request.season_tag,
+            fields=request.fields,
+            items=request.items,
+        )
+        return {
+            "menu": menu_data,
+            "menu_items": menu_items_data,
+        }
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(exc),
+        ) from exc
 
 
 # TODO: conectar Supabase
@@ -156,10 +162,51 @@ async def search_menu_items(
         restaurant_id = menu_to_restaurant.get(item["menu_id"])
         restaurant_name = restaurant_lookup.get(restaurant_id, "Unknown")
 
-        results.append({
-            **item,
-            "restaurant_id": restaurant_id,
-            "restaurant_name": restaurant_name,
-        })
+        results.append(
+            {
+                **item,
+                "restaurant_id": restaurant_id,
+                "restaurant_name": restaurant_name,
+            }
+        )
 
     return results
+
+@router.post(
+    "/predictions",
+    response_model=PredictionOut,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_menu_prediction(
+    request: PredictionGenerateRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Generates and stores weekly menu predictions for the authenticated restaurant.
+    Only owners and admins can generate predictions.
+    """
+    if current_user.get("role") not in {"owner", "admin"}:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only owners and admins can generate predictions",
+        )
+
+    try:
+        from app.services.menu_service import create_weekly_prediction
+
+        prediction = await create_weekly_prediction(
+            current_user=current_user,
+            week_start_date=request.week_start_date,
+        )
+        return prediction
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(exc),
+        ) from exc

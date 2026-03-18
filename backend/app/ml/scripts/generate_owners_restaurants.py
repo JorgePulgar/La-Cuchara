@@ -42,7 +42,7 @@ from supabase import Client, create_client
 NUM_RESTAURANTS = 15
 DRY_RUN = False
 RANDOM_SEED = 42
-EMAIL_DOMAIN = "lacuchara-demo.local"
+EMAIL_DOMAIN = "lacuchara-demo.dev"
 DEFAULT_OWNER_PASSWORD = "OwnerDemo123!"
 AUTO_CONFIRM_EMAIL = True
 

@@ -84,7 +84,7 @@ dish_stats["avg_rating"] = dish_stats["avg_rating"].round(2)
 # Opcional: si quieres imputar platos sin rating con un valor neutro
 # dish_stats["avg_rating"] = dish_stats["avg_rating"].fillna(0)
 
-dish_stats.to_csv("dish_stats.csv", index=False)
+dish_stats.to_csv("data/dish_stats.csv", index=False)
 
 print("\nDish stats generado:")
 print(dish_stats.head())
