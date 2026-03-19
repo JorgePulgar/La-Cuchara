@@ -170,7 +170,7 @@ export default function DashboardPage() {
                             {/* Today's menu modal / panel */}
                             {(selectedMenu || menuError) && (
                                 <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-                                    <div className="bg-ecruwhite rounded-3xl shadow-2xl border-4 border-thunderbird-100 max-w-lg w-full max-h-[80vh] overflow-y-auto p-8">
+                                    <div className="app-card bg-ecruwhite rounded-3xl shadow-2xl border-4 border-thunderbird-100 max-w-lg w-full max-h-[80vh] overflow-y-auto p-8">
                                         <div className="flex justify-between items-start mb-6">
                                             <h3 className="text-2xl font-brand text-thunderbird-700">
                                                 Menú de hoy — {selectedRestaurantName}

@@ -75,7 +75,7 @@ export default function MenuItemSearch({ lat, lon, radiusKm }: MenuItemSearchPro
 
             {/* Results */}
             {searched && query.trim() && (
-                <div className="mt-3 bg-ecruwhite rounded-2xl border-2 border-thunderbird-100 shadow-xl overflow-hidden">
+                <div className="app-card mt-3 bg-ecruwhite rounded-2xl border-2 border-thunderbird-100 shadow-xl overflow-hidden">
                     {results.length === 0 ? (
                         <div className="px-6 py-10 text-center text-gray-500 text-sm font-medium italic">
                             No se encontraron platos para &quot;{query}&quot;
@@ -99,7 +99,7 @@ export default function MenuItemSearch({ lat, lon, radiusKm }: MenuItemSearchPro
                                             </p>
                                         </div>
                                         {item.price != null && (
-                                            <span className="text-sm font-semibold text-gray-800 ml-3 flex-shrink-0">
+                                            <span className="text-sm font-semibold text-gray-800 ml-3 shrink-0">
                                                 {item.price.toFixed(2)} €
                                             </span>
                                         )}

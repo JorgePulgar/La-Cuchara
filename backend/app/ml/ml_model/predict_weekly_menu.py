@@ -93,14 +93,29 @@ def build_candidate_score_table(
     if season_tag is None:
         season_tag = infer_season_tag(restaurant_df, target_date)
 
-    candidates = (
-        restaurant_df[
-            (restaurant_df["category"] == category)
-            & (restaurant_df["date"] < target_date)
-        ]["normalized_name"]
+    historical_df = restaurant_df[
+        (restaurant_df["category"] == category)
+        & (restaurant_df["date"] < target_date)
+    ].copy()
+
+    season_candidates = (
+        historical_df[historical_df["season_tag"] == season_tag]["normalized_name"]
         .drop_duplicates()
         .tolist()
     )
+
+    all_candidates = (
+        historical_df["normalized_name"]
+        .drop_duplicates()
+        .tolist()
+    )
+
+    # Si hay suficientes candidatos de temporada, usar solo esos
+    min_candidates_required = 6  # ajústalo si quieres
+    if len(season_candidates) >= min_candidates_required:
+        candidates = season_candidates
+    else:
+        candidates = all_candidates
 
     rows = []
 
@@ -127,8 +142,21 @@ def build_candidate_score_table(
 
     score_df["score"] = model.predict_proba(score_df[FEATURE_COLUMNS])[:, 1]
 
+    score_df["seasonal_penalty"] = 0.0
+
+    # Penaliza platos nunca usados en esa temporada
+    score_df.loc[score_df["times_used_same_season"] == 0, "seasonal_penalty"] = 0.20
+
+    # Penaliza también platos con uso de temporada muy bajo
+    score_df.loc[
+        (score_df["times_used_same_season"] > 0) & (score_df["usage_rate_same_season"] < 0.05),
+        "seasonal_penalty"
+    ] = 0.10
+
+    score_df["final_score"] = score_df["score"] - score_df["seasonal_penalty"]
+
     score_df = score_df.sort_values(
-        by=["score", "times_used_hist", "avg_units_sold_hist", "avg_rating_hist"],
+        by=["final_score", "times_used_same_season", "times_used_hist", "avg_units_sold_hist"],
         ascending=[False, False, False, False],
     ).reset_index(drop=True)
 

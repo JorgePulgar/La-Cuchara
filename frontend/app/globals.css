@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f0e4;
+  --background: #ebe2ce;
   --foreground: #171717;
 }
 
@@ -12,7 +12,9 @@
   --font-sans: "Inter", var(--font-geist-sans);
   --font-brand: "Grand Hotel", cursive;
   
-  --color-ecruwhite: #f4f0e4;
+  --color-ecruwhite: #ebe2ce;
+  --color-ecruwhite-light: #f2ebdc;
+  --color-ecruwhite-dark: #ddd1b7;
   
   --color-thunderbird-50: #fef3f2;
   --color-thunderbird-100: #ffe5e1;
@@ -28,11 +30,55 @@
 }
 
 body {
-  background: var(--color-ecruwhite);
+  background: linear-gradient(
+    155deg,
+    var(--color-ecruwhite-light) 0%,
+    var(--color-ecruwhite) 45%,
+    var(--color-ecruwhite-dark) 100%
+  );
   color: #1a1a1a;
   font-family: var(--font-sans);
+  min-height: 100vh;
 }
 
 .font-brand {
   font-family: var(--font-brand);
+}
+
+button {
+  border: none !important;
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+  transition: background-color 0.2s ease, color 0.2s ease, filter 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+button:active:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--color-thunderbird-500);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  filter: saturate(0.85);
+}
+
+.app-card {
+  background: color-mix(in srgb, var(--color-ecruwhite) 92%, white 8%);
+  border: none !important;
+  border-radius: 1rem;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+}
+
+.app-card-soft {
+  background: color-mix(in srgb, var(--color-ecruwhite) 95%, white 5%);
+  border: none !important;
+  border-radius: 0.9rem;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
 }

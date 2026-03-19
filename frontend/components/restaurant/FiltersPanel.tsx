@@ -23,7 +23,7 @@ export default function FiltersPanel({
     onHasMenuTodayChange,
 }: FiltersPanelProps) {
     return (
-        <div className="bg-ecruwhite rounded-2xl border-4 border-thunderbird-100 p-6 shadow-xl">
+        <div className="app-card bg-ecruwhite rounded-2xl border-4 border-thunderbird-100 p-6 shadow-xl">
             <h3 className="text-sm font-black text-thunderbird-700 mb-6 uppercase tracking-widest">
                 Filtros
             </h3>

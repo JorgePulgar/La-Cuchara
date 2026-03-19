@@ -299,7 +299,7 @@ export default function MenuUpload() {
     if (phase === "analyzing") {
         return (
             <div className="w-full max-w-4xl">
-                <div className="rounded-2xl border-4 border-ecruwhite bg-ecruwhite shadow-xl p-12 text-center space-y-6">
+                <div className="app-card rounded-2xl border-4 border-ecruwhite bg-ecruwhite shadow-xl p-12 text-center space-y-6">
                     <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-thunderbird-100 border-t-thunderbird-700 shadow-sm" />
                     <h3 className="text-2xl font-brand text-thunderbird-700">
                         Analizando imagen del menú
@@ -333,7 +333,7 @@ export default function MenuUpload() {
                     </div>
                 )}
 
-                <div className="bg-ecruwhite border-2 border-thunderbird-100 shadow-xl rounded-2xl p-8 space-y-8">
+                <div className="app-card bg-ecruwhite border-2 border-thunderbird-100 shadow-xl rounded-2xl p-8 space-y-8">
                     <div className="border-b border-gray-100 pb-6">
                         <h2 className="text-3xl font-brand text-thunderbird-700">
                             Formulario del menú

@@ -351,6 +351,7 @@ import type {
     NearbyRestaurant,
     MenuWithItems,
     MenuItemSearchResult,
+    Prediction,
 } from "@/types";
 
 export interface NearbyFilters {
@@ -415,5 +416,25 @@ export async function getOwnerMenus(): Promise<SaveMenuResponse[]> {
 export async function reuseMenu(menuId: string): Promise<SaveMenuResponse> {
     return apiFetch<SaveMenuResponse>(`/menus/owner/${menuId}/reuse`, {
         method: "POST",
+    });
+}
+
+/**
+ * GET /menus/predictions
+ */
+export async function getOwnerPrediction(weekStartDate: string): Promise<Prediction> {
+    const params = new URLSearchParams({
+        week_start_date: weekStartDate,
+    });
+    return apiFetch<Prediction>(`/menus/predictions?${params.toString()}`);
+}
+
+/**
+ * POST /menus/predictions
+ */
+export async function generateOwnerPrediction(weekStartDate: string): Promise<Prediction> {
+    return apiFetch<Prediction>("/menus/predictions", {
+        method: "POST",
+        body: JSON.stringify({ week_start_date: weekStartDate }),
     });
 }

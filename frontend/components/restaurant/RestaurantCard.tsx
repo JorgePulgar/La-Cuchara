@@ -21,7 +21,7 @@ export default function RestaurantCard({
     menuLoading = false,
 }: RestaurantCardProps) {
     return (
-        <div className="bg-ecruwhite rounded-2xl border-2 border-thunderbird-200 p-6 shadow-md hover:shadow-xl transition-all border-b-4 border-b-thunderbird-100">
+        <div className="app-card bg-ecruwhite rounded-2xl border-2 border-thunderbird-200 p-6 shadow-md hover:shadow-xl transition-all border-b-4 border-b-thunderbird-100">
             <div className="flex justify-between items-start mb-3">
                 <div>
                     <h3 className="text-xl font-bold text-thunderbird-950">
@@ -33,7 +33,7 @@ export default function RestaurantCard({
                         </p>
                     )}
                 </div>
-                <div className="text-right flex-shrink-0 ml-4">
+                <div className="text-right shrink-0 ml-4">
                     <span className="inline-block bg-thunderbird-700 text-ecruwhite text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg shadow-sm">
                         {restaurant.distance_km.toFixed(1)} KM
                     </span>

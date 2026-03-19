@@ -13,7 +13,7 @@ export default function UploadPage() {
             <Navbar />
             <main className="min-h-screen bg-ecruwhite px-4 py-12">
                 <div className="max-w-lg mx-auto">
-                    <div className="bg-ecruwhite/80 rounded-2xl shadow-xl border-4 border-white/50 p-8 backdrop-blur-sm">
+                    <div className="app-card bg-ecruwhite/80 rounded-2xl shadow-xl border-4 border-white/50 p-8 backdrop-blur-sm">
                         <h1 className="text-2xl font-bold text-gray-900 mb-2">
                             Subir menú
                         </h1>

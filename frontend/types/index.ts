@@ -155,3 +155,43 @@ export interface Rating {
 export interface ApiError {
     detail: string;
 }
+
+// =============================================================================
+// Predictions
+// =============================================================================
+
+export interface PredictedMenuItem {
+    normalized_name: string;
+    score: number;
+    rank: number;
+    avg_units_sold?: number;
+    avg_units_sold_hist?: number;
+    avg_rating?: number;
+    avg_rating_hist?: number;
+    times_used?: number;
+    times_used_hist?: number;
+}
+
+export interface PredictedDay {
+    date?: string;
+    weekday: string;
+    season_tag?: string;
+    primeros: PredictedMenuItem[];
+    segundos: PredictedMenuItem[];
+}
+
+export interface PredictedMenuPayload {
+    restaurant_id: string;
+    season_tag?: string;
+    model_version?: string;
+    days: PredictedDay[];
+}
+
+export interface Prediction {
+    id?: string | null;
+    restaurant_id: string;
+    week_start_date: string;
+    predicted_menu_items: PredictedMenuPayload | Record<string, unknown>;
+    predicted_services?: number | null;
+    model_version?: string | null;
+}

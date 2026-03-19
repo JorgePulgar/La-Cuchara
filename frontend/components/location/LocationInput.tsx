@@ -85,7 +85,7 @@ export default function LocationInput({ onLocationSet }: LocationInputProps) {
     };
 
     return (
-        <div className="bg-ecruwhite rounded-3xl border-4 border-thunderbird-100 shadow-2xl p-8 max-w-xl mx-auto">
+        <div className="app-card bg-ecruwhite rounded-3xl border-4 border-thunderbird-100 shadow-2xl p-8 max-w-xl mx-auto">
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-brand text-thunderbird-700 mb-2">
                     Encuentra comida cerca de ti
