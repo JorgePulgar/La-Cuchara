@@ -1,0 +1,61 @@
+# ===========================
+# Environment Variables
+# ===========================
+.env
+.env.local
+.env.*.local
+
+# ===========================
+# Python / Backend
+# ===========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+*.egg
+
+# ===========================
+# Node.js / Frontend
+# ===========================
+node_modules/
+.next/
+out/
+
+# ===========================
+# IDE & OS
+# ===========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===========================
+# Temporary / Build artifacts
+# ===========================
+*.log
+frontend_temp/
+
+# ===========================
+# Agent / AI tooling
+# ===========================
+.agent/
+AGENT_STATUS.log
+CLEANUP_PENDING.md
+TASKS.md
+supabase_schema.sql
+
+*.csv
+*.rar
+*.jpg
+*.jpeg
+*.png
+*.json
+prueba*

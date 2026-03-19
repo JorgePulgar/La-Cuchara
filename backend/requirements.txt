@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+supabase
+python-dotenv
+pydantic[email]>=2.0
+httpx>=0.25.0
+python-multipart
+unidecode
+pandas
