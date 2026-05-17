@@ -4,6 +4,8 @@
 
 A full-stack web application that digitizes restaurant menus using OCR and predicts daily offerings using machine learning. Restaurants upload photos of their menus; the system extracts the data automatically and makes it searchable by location and filters.
 
+Built as a 2–3 week master's group project at Tajamar with [Íñigo](https://github.com/isaji-23).
+
 ## What it does
 
 - **OCR pipeline**: extracts structured menu data (dishes, prices, categories) from restaurant menu photos using Azure Computer Vision
@@ -58,3 +60,8 @@ See `backend/.env.example` and `frontend/.env.local.example` for required variab
 ## Database
 
 The SQL schema for Supabase is at `backend/supabase_schema.sql`.
+
+## Authors
+
+- [Jorge Pulgar](https://github.com/JorgePulgar)
+- [Íñigo](https://github.com/isaji-23)
